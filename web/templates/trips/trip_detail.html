@@ -1,0 +1,268 @@
+{{template "base.html" .}}
+
+{{define "title"}}{{.Trip.DriverName}} → {{.Trip.OfficeName}} — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/trips/trip_detail.css?v={{.Trip.UpdatedAt.Unix}}">
+{{end}}
+
+{{define "content"}}
+<div class="detail-container" x-data="tripDetail()">
+
+    <!-- Заголовок -->
+    <div class="detail-header">
+        <a href="/trips" class="btn-back-arrow">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+            <h1 class="page-title">Детали поездки</h1>
+            <p class="page-subtitle">{{.Trip.OfficeName}} · {{formatDate .Trip.DepartAt}}</p>
+        </div>
+    </div>
+
+    <div class="detail-layout">
+
+        <!-- Основная информация -->
+        <div class="detail-main-col">
+
+            <!-- Карточка поездки -->
+            <div class="card">
+                <div class="driver-profile-header justify-between mb-5">
+                    <div class="driver-info-box">
+                        <div class="detail-driver-avatar">
+                            <span class="detail-driver-avatar-text">{{slice .Trip.DriverName 0 1}}</span>
+                        </div>
+                        <div>
+                            <p class="driver-name">{{.Trip.DriverName}}</p>
+                            <p class="driver-role">Водитель</p>
+                        </div>
+                    </div>
+                    {{if eq .Trip.Status "cancelled"}}
+                    <span class="badge-status-lg badge-status-lg-cancelled">✗ Отменена</span>
+                    {{else if isTripPast .Trip.DepartAt .Trip.DurationSeconds}}
+                    <span class="badge-status-lg badge-status-lg-completed">✓ Завершена</span>
+                    {{else if eq .Trip.Status "scheduled"}}
+                    <span class="badge-status-lg badge-status-lg-scheduled">
+                        <span class="status-pulse-dot bg-emerald-550"></span>Запланирована
+                    </span>
+                    {{else if eq .Trip.Status "in_progress"}}
+                    <span class="badge-status-lg badge-status-lg-inprogress">
+                        <span class="status-pulse-dot bg-blue-550"></span>В пути
+                    </span>
+                    {{else if eq .Trip.Status "completed"}}
+                    <span class="badge-status-lg badge-status-lg-completed">✓ Завершена</span>
+                    {{end}}
+                </div>
+
+                <!-- Маршрут -->
+                <div class="route-list">
+                    <!-- Старт -->
+                    <div class="route-main-row">
+                        <div class="route-dot-icon bg-blue-600 ring-blue-100">
+                            <span class="route-dot-emoji">🚌</span>
+                        </div>
+                        <div class="route-info">
+                            <p class="route-label">Отправление</p>
+                            <p class="route-address truncate">{{.Trip.OriginAddress}}</p>
+                        </div>
+                        <div class="route-time-box">
+                            <p class="route-time">{{formatTime .Trip.DepartAt}}</p>
+                            <p class="route-label">{{formatDate .Trip.DepartAt}}</p>
+                        </div>
+                    </div>
+
+                    <!-- Промежуточные остановки -->
+                    {{range .Trip.Stops}}
+                    <div class="route-line-connector"></div>
+                    <div class="stop-row-clickable"
+                         :class="selectedStopID === '{{.ID}}' ? 'stop-row-active' : ''"
+                         @click="selectStop('{{.ID}}', {{.Lat}}, {{.Lng}}, '{{.Address}}')">
+                        {{if and $.Trip.UserPickupStop (eq .ID $.Trip.UserPickupStop.ID)}}
+                        <div class="route-dot-icon bg-emerald-600 ring-emerald-100">
+                            <span class="route-dot-seq">{{.SequenceNumber}}</span>
+                        </div>
+                        <div class="route-info">
+                            <p class="route-label-active">Остановка {{.SequenceNumber}} (Ваша остановка)</p>
+                            <p class="route-address route-address-active truncate">{{.Address}}</p>
+                        </div>
+                        <div class="route-time-box">
+                            <p class="route-time-active">{{formatTime .ArrivalTime}}</p>
+                        </div>
+                        {{else}}
+                        <div class="route-dot-icon bg-indigo-600 ring-indigo-100">
+                            <span class="route-dot-seq">{{.SequenceNumber}}</span>
+                        </div>
+                        <div class="route-info">
+                            <p class="route-label">Остановка {{.SequenceNumber}}</p>
+                            <p class="route-address truncate">{{.Address}}</p>
+                        </div>
+                        <div class="route-time-box">
+                            <p class="route-time-indigo">{{formatTime .ArrivalTime}}</p>
+                        </div>
+                        {{end}}
+                    </div>
+                    {{end}}
+
+                    <div class="route-line-connector"></div>
+                    <!-- Финиш / Офис -->
+                    <div class="route-main-row">
+                        <div class="route-dot-icon bg-red-500 ring-red-100">
+                            <span class="route-dot-emoji">🏢</span>
+                        </div>
+                        <div class="route-info">
+                            <p class="route-label">Назначение (офис)</p>
+                            <p class="route-address truncate">{{.Trip.OfficeName}}</p>
+                        </div>
+                        <div class="route-time-box">
+                            <p class="route-time">{{formatTime (addSeconds .Trip.DepartAt .Trip.DurationSeconds)}}</p>
+                            <p class="route-label">{{formatDate (addSeconds .Trip.DepartAt .Trip.DurationSeconds)}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="detail-stats-grid">
+                    <div class="detail-stat-box">
+                        <p class="detail-stat-label">Мест осталось</p>
+                        <p class="detail-stat-val-lg">{{.Trip.SeatsLeft}}<span class="detail-stat-val-total">/{{.Trip.SeatsTotal}}</span></p>
+                    </div>
+                    <div class="detail-stat-box">
+                        <p class="detail-stat-label">Время в пути</p>
+                        <p class="detail-stat-val-lg">{{formatDuration .Trip.DurationSeconds}}</p>
+                    </div>
+                    <div class="detail-stat-box">
+                        <p class="detail-stat-label">Дистанция</p>
+                        <p class="detail-stat-val-lg">{{formatDistanceInt .Trip.DistanceMeters}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карта -->
+            <div class="detail-map-wrapper">
+                <div id="trip-map"></div>
+            </div>
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="detail-side-col">
+
+            {{if and (eq .Trip.Status "scheduled") (not (isTripPast .Trip.DepartAt .Trip.DurationSeconds))}}
+            <div class="side-card side-actions-wrapper">
+
+                {{/* Водитель или админ — кнопка отмены */}}
+                {{if or (eq .CurrentUser .Trip.DriverID.String) (eq .User.Role "admin")}}
+                <button @click="cancel()"
+                        class="btn-cancel-action">
+                    Отменить поездку
+                </button>
+
+                {{/* Не водитель (пассажир) */}}
+                {{else}}
+                    {{/* Проверяем — уже зарегистрирован ли пассажир */}}
+                    {{$isPassenger := false}}
+                    {{range .Passengers}}
+                        {{if eq $.CurrentUser .UserID.String}}
+                            {{$isPassenger = true}}
+                        {{end}}
+                    {{end}}
+
+                    {{if $isPassenger}}
+                    <!-- Уже зарегистрирован — показываем статус и кнопку выхода -->
+                    <div class="pickup-status-banner">
+                        <p class="pickup-status-title">Вы зарегистрированы</p>
+                        <p class="pickup-status-desc">Вы уже присоединились к этой поездке</p>
+                    </div>
+                    <button @click="leave()"
+                            :disabled="leaving"
+                            class="btn-leave-action">
+                        <span x-show="!leaving">Покинуть поездку</span>
+                        <span x-show="leaving" x-cloak>Выходим...</span>
+                    </button>
+
+                    {{else}}
+                    <!-- Не зарегистрирован — форма выбора остановки -->
+                    <div>
+                        <label class="detail-side-label">Выберите остановку для посадки</label>
+                        {{if .Trip.Stops}}
+                        <select x-model="selectedStopID" @change="onStopSelectDropdown()"
+                                class="input-text mb-2">
+                            <option value="">— Выберите остановку —</option>
+                            {{range .Trip.Stops}}
+                            <option value="{{.ID}}">Остановка {{.SequenceNumber}}: {{.Address}} ({{formatTime .ArrivalTime}})</option>
+                            {{end}}
+                        </select>
+                        {{else}}
+                        <div class="detail-alert-warning">
+                            ⚠️ У этого маршрута нет промежуточных остановок. Уточните у водителя.
+                        </div>
+                        {{end}}
+                    </div>
+                    <button @click="join()"
+                            :disabled="!selectedStopID || joining"
+                            class="btn-primary btn-full">
+                        <span x-show="!joining">🚗 Присоединиться</span>
+                        <span x-show="joining" x-cloak>Подключаем...</span>
+                    </button>
+                    {{end}}
+                {{end}}
+            </div>
+            {{end}}
+
+            <!-- Пассажиры -->
+            <div class="side-card">
+                <h3 class="side-card-title">👥 Пассажиры
+                    <span class="side-card-title-count">({{len .Passengers}})</span>
+                </h3>
+                {{if .Passengers}}
+                <div class="passengers-list">
+                    {{range .Passengers}}
+                    <div class="passenger-row">
+                        <div class="passenger-avatar">
+                            <span class="passenger-avatar-text">{{slice .UserFullName 0 1}}</span>
+                        </div>
+                        <div class="passenger-info">
+                            <p class="passenger-name">{{.UserFullName}}</p>
+                            <p class="passenger-stop">📍 {{.PickupAddress}}</p>
+                        </div>
+                        {{if eq $.CurrentUser .UserID.String}}
+                        <span class="badge-passenger-self">Вы</span>
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
+                {{else}}
+                <div class="passengers-empty">
+                    <p class="passengers-empty-text">Пока нет пассажиров</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <!-- Ошибка -->
+    <div x-show="actionError" x-cloak
+         class="fixed bottom-4 right-4 bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl shadow-xl max-w-sm"
+         x-text="actionError"></div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+window.AppConfig = {
+    isPassenger: {{.IsPassenger}},
+    trip: {
+        routeGeoJSON: {{.Trip.RouteGeoJSON}},
+        originLat: {{.Trip.OriginLat}},
+        originLng: {{.Trip.OriginLng}},
+        tripId: "{{.Trip.ID}}",
+        userPickupStopID: "{{if .Trip.UserPickupStop}}{{.Trip.UserPickupStop.ID}}{{end}}",
+        stops: [
+            {{range .Trip.Stops}}
+            { id: "{{.ID}}", lat: {{.Lat}}, lng: {{.Lng}}, address: {{.Address}}, seq: {{.SequenceNumber}}, arrivalTime: "{{formatTime .ArrivalTime}}" },
+            {{end}}
+        ]
+    }
+};
+</script>
+<script src="/static/js/trips/trip_detail.js?v={{.Trip.UpdatedAt.Unix}}"></script>
+{{end}}

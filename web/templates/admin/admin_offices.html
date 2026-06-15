@@ -1,0 +1,166 @@
+{{template "base.html" .}}
+
+{{define "title"}}Офисы — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/admin/admin.css">
+{{end}}
+
+{{define "content"}}
+<div class="admin-container" x-data="officesAdmin()">
+    <div class="admin-header-row">
+        <div>
+            <h1 class="page-title">🏢 Офисы</h1>
+            <p class="page-subtitle">Управление офисами и зонами подбора</p>
+        </div>
+        <button @click="showCreateModal = true"
+                class="btn-primary">
+            ➕ Добавить офис
+        </button>
+    </div>
+
+    {{if .Offices}}
+    <div class="admin-offices-grid">
+        {{range .Offices}}
+        <div class="admin-office-card">
+            <div class="admin-office-card-header">
+                <div>
+                    <h3 class="admin-office-name">{{.Name}}</h3>
+                    <p class="admin-office-address">📍 {{.Address}}</p>
+                    <p class="admin-office-coords">{{.Lat}}, {{.Lng}}</p>
+                </div>
+                {{if .IsActive}}
+                <span class="badge badge-emerald">Активен</span>
+                {{else}}
+                <span class="badge badge-gray">Деактивирован</span>
+                {{end}}
+            </div>
+            <div class="admin-office-card-actions">
+                <button @click="openZoneModal('{{.ID}}')"
+                        class="btn-office-action-zone">
+                    ⚙️ Настроить зону
+                </button>
+                <button onclick="deactivateOffice('{{.ID}}')"
+                        class="btn-office-action-deactivate">
+                    🗑 Деактивировать
+                </button>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="admin-empty-state">
+        <div class="admin-empty-icon">🏢</div>
+        <h3 class="admin-empty-title">Офисов нет</h3>
+        <button @click="showCreateModal = true" class="admin-empty-link">
+            Добавить первый офис →
+        </button>
+    </div>
+    {{end}}
+
+    <!-- Модал создания офиса -->
+    <div x-show="showCreateModal" x-cloak
+         class="admin-modal-overlay"
+         @click.self="showCreateModal = false">
+        <div class="admin-modal">
+            <h3 class="admin-modal-title">Добавить офис</h3>
+            <form @submit.prevent="createOffice()" class="admin-form-space">
+                <div>
+                    <label class="admin-form-label">Название</label>
+                    <input type="text" x-model="newOffice.name" placeholder="Офис Центр"
+                           class="input-text">
+                </div>
+                <div>
+                    <label class="admin-form-label">Адрес</label>
+                    <input type="text" x-model="newOffice.address" placeholder="ул. Пушкина, 1"
+                           class="input-text">
+                </div>
+                <div class="admin-grid-2">
+                    <div>
+                        <label class="admin-form-label">Широта (lat)</label>
+                        <input type="number" step="0.000001" x-model="newOffice.lat" placeholder="55.7558"
+                               class="input-text">
+                    </div>
+                    <div>
+                        <label class="admin-form-label">Долгота (lng)</label>
+                        <input type="number" step="0.000001" x-model="newOffice.lng" placeholder="37.6173"
+                               class="input-text">
+                    </div>
+                </div>
+                <div x-show="createError" x-cloak class="admin-error-box" x-text="createError"></div>
+                <div class="admin-form-actions">
+                    <button type="button" @click="showCreateModal = false"
+                            class="btn-secondary btn-flex-1">
+                        Отмена
+                    </button>
+                    <button type="submit" :disabled="creating"
+                            class="btn-primary btn-flex-1">
+                        Создать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модал настройки зоны -->
+    <div x-show="showZoneModal" x-cloak
+         class="admin-modal-overlay"
+         @click.self="showZoneModal = false">
+        <div class="admin-modal-scrollable">
+            <h3 class="admin-modal-title">Настройка зоны подбора</h3>
+            <form @submit.prevent="saveZone()" class="admin-form-space">
+                <div>
+                    <label class="admin-form-label">Геометрия зоны (GeoJSON Polygon)</label>
+                    <textarea x-model="zoneForm.pickupZoneStr" placeholder='{"type":"Polygon","coordinates":[[[37.2,55.5],[38.0,55.5],[38.0,56.0],[37.2,56.0],[37.2,55.5]]]}' rows="6"
+                              class="input-textarea"></textarea>
+                    <p class="admin-input-hint">Должен быть валидный GeoJSON типа Polygon.</p>
+                </div>
+                <div class="admin-grid-2">
+                    <div>
+                        <label class="admin-form-label">Макс. отклонение (мин)</label>
+                        <input type="number" x-model.number="zoneForm.maxDetourMinutes" min="1" max="60"
+                               class="input-text">
+                    </div>
+                    <div>
+                        <label class="admin-form-label">Макс. расстояние (м)</label>
+                        <input type="number" x-model.number="zoneForm.maxDistanceMeters" min="100" max="10000"
+                               class="input-text">
+                    </div>
+                </div>
+                <div class="admin-grid-3">
+                    <div>
+                        <label class="admin-form-label">Присоединиться за (мин)</label>
+                        <input type="number" x-model.number="zoneForm.minJoinMinutes" min="5" max="180"
+                               class="input-text">
+                    </div>
+                    <div>
+                        <label class="admin-form-label">Отменить за (мин)</label>
+                        <input type="number" x-model.number="zoneForm.minCancelMinutes" min="5" max="180"
+                               class="input-text">
+                    </div>
+                    <div>
+                        <label class="admin-form-label">Макс. пассажиров</label>
+                        <input type="number" x-model.number="zoneForm.maxSeats" min="1" max="20"
+                               class="input-text">
+                    </div>
+                </div>
+                <div x-show="zoneError" x-cloak class="admin-error-box" x-text="zoneError"></div>
+                <div class="admin-form-actions">
+                    <button type="button" @click="showZoneModal = false"
+                            class="btn-secondary btn-flex-1">
+                        Отмена
+                    </button>
+                    <button type="submit" :disabled="savingZone"
+                            class="btn-primary btn-flex-1">
+                        Сохранить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script src="/static/js/admin/admin_offices.js"></script>
+{{end}}

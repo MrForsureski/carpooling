@@ -1,0 +1,101 @@
+{{define "nav.html"}}
+<nav class="navbar" x-data="{ mobileOpen: false }">
+    <div class="navbar-container">
+        <div class="navbar-wrapper">
+
+            <!-- Лого -->
+            <a href="/map" class="logo-link group">
+                <div class="logo-container">
+                    <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                </div>
+                <span class="logo-text">{{.AppName}}</span>
+            </a>
+
+            <!-- Десктоп меню -->
+            <div class="nav-links">
+                <a href="/map" class="nav-link">
+                    🗺️ Карта
+                </a>
+                <a href="/trips" class="nav-link">
+                    🚗 Поездки
+                </a>
+                {{if .User}}
+                    {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
+                    <a href="/trips/new" class="nav-link">
+                        ➕ Создать поездку
+                    </a>
+                    {{end}}
+                    <a href="/trips/my" class="nav-link">
+                        📋 Мои поездки
+                    </a>
+                    {{if eq .User.Role "admin"}}
+                    <a href="/admin" class="nav-link">
+                        ⚙️ Админ
+                    </a>
+                    {{end}}
+                    <!-- Профиль -->
+                    <div class="nav-user-dropdown" x-data="{ open: false }">
+                        <button @click="open = !open" class="nav-user-btn">
+                            <div class="nav-user-avatar">
+                                <span class="nav-user-avatar-text">{{slice .User.FullName 0 1}}</span>
+                            </div>
+                            <span class="nav-user-name">{{.User.FullName}}</span>
+                            <svg class="nav-user-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-cloak
+                             x-transition
+                             class="dropdown-menu">
+                            <div class="dropdown-header">
+                                <p class="dropdown-email">{{.User.Email}}</p>
+                                <p class="dropdown-role">
+                                    {{if eq .User.Role "admin"}}🔑 Администратор
+                                    {{else if eq .User.Role "driver"}}🚗 Водитель
+                                    {{else if eq .User.Role "passenger"}}👤 Пассажир
+                                    {{else}}⏳ Не верифицирован{{end}}
+                                </p>
+                            </div>
+                            <a href="/profile" class="dropdown-item">Профиль</a>
+                            <button hx-post="/auth/logout" hx-target="body" hx-swap="outerHTML"
+                                    class="dropdown-item dropdown-item-logout">
+                                Выйти
+                            </button>
+                        </div>
+                    </div>
+                {{else}}
+                    <a href="/login" class="nav-link-login">Войти</a>
+                    <a href="/register" class="btn-nav-register">
+                        Регистрация
+                    </a>
+                {{end}}
+            </div>
+
+            <!-- Мобильный бургер -->
+            <button @click="mobileOpen = !mobileOpen" class="nav-burger">
+                <svg class="nav-burger-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path x-show="!mobileOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    <path x-show="mobileOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Мобильное меню -->
+    <div x-show="mobileOpen" x-cloak x-transition class="mobile-menu">
+        <a href="/map" class="mobile-menu-link">🗺️ Карта</a>
+        <a href="/trips" class="mobile-menu-link">🚗 Поездки</a>
+        {{if .User}}
+            <a href="/trips/my" class="mobile-menu-link">📋 Мои поездки</a>
+            {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
+            <a href="/trips/new" class="mobile-menu-link">➕ Создать поездку</a>
+            {{end}}
+            <a href="/profile" class="mobile-menu-link">👤 Профиль</a>
+            <button hx-post="/auth/logout" class="mobile-menu-link mobile-menu-logout">Выйти</button>
+        {{else}}
+            <a href="/login" class="mobile-menu-link">Войти</a>
+            <a href="/register" class="mobile-menu-link mobile-menu-register">Регистрация</a>
+        {{end}}
+    </div>
+</nav>
+{{end}}

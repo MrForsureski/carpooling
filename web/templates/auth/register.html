@@ -1,0 +1,90 @@
+{{template "base.html" .}}
+
+{{define "title"}}Регистрация — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/auth/auth.css">
+{{end}}
+
+{{define "content"}}
+<div class="auth-container">
+    <div class="auth-wrapper">
+
+        <div class="auth-header">
+            <div class="auth-logo-box auth-logo-register">
+                <svg class="auth-logo-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
+            </div>
+            <h1 class="auth-title">Создать аккаунт</h1>
+            <p class="auth-subtitle">Присоединяйтесь к корпоративному карпулингу</p>
+        </div>
+
+        <div class="auth-card">
+            <form x-data="registerForm()" @submit.prevent="submit()" class="auth-form-space">
+
+                <div>
+                    <label for="reg-name" class="auth-label">Полное имя</label>
+                    <input id="reg-name" type="text" x-model="fullName" placeholder="Иван Петров"
+                           autocomplete="name" required
+                           class="auth-input">
+                </div>
+
+                <div>
+                    <label for="reg-email" class="auth-label">Корпоративный email</label>
+                    <input id="reg-email" type="email" x-model="email" placeholder="ivan@company.com"
+                           autocomplete="email" required
+                           class="auth-input">
+                    <p class="auth-input-hint">Только корпоративные email-домены компании</p>
+                </div>
+
+                <div>
+                    <label for="reg-phone" class="auth-label">Телефон <span class="auth-label-required-marker">(необязательно)</span></label>
+                    <input id="reg-phone" type="tel" x-model="phone" placeholder="+7 900 123-45-67"
+                           autocomplete="tel"
+                           class="auth-input">
+                </div>
+
+                <div>
+                    <label for="reg-password" class="auth-label">Пароль</label>
+                    <input id="reg-password" type="password" x-model="password" placeholder="Минимум 8 символов"
+                           autocomplete="new-password" required minlength="8"
+                           class="auth-input">
+                    <!-- Индикатор силы пароля -->
+                    <div class="auth-strength-meter" x-show="password.length > 0">
+                        <div class="auth-strength-bar"
+                             :class="password.length >= 8 ? 'strength-bar-active' : 'strength-bar-inactive'"></div>
+                        <div class="auth-strength-bar"
+                             :class="password.length >= 12 ? 'strength-bar-active' : 'strength-bar-inactive'"></div>
+                        <div class="auth-strength-bar"
+                             :class="/[A-Z]/.test(password) && /[0-9]/.test(password) ? 'strength-bar-active' : 'strength-bar-inactive'"></div>
+                    </div>
+                </div>
+
+                <!-- Ошибка / Успех -->
+                <div x-show="error" x-cloak class="auth-alert-error" x-text="error"></div>
+                <div x-show="success" x-cloak class="auth-alert-success" x-text="success"></div>
+
+                <button type="submit"
+                        :disabled="loading || success"
+                        class="btn-primary">
+                    <span x-show="!loading">Создать аккаунт</span>
+                    <span x-show="loading" x-cloak class="flex-center-gap-2">
+                        <svg class="spinner spinner-icon" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Регистрируем...
+                    </span>
+                </button>
+            </form>
+
+            <p class="auth-footer">
+                Уже есть аккаунт?
+                <a href="/login" class="auth-link">Войти</a>
+            </p>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script src="/static/js/auth/register.js"></script>
+{{end}}

@@ -1,0 +1,154 @@
+{{template "base.html" .}}
+
+{{define "title"}}Создать поездку — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/trips/create_trip.css?v=1.0.2">
+{{end}}
+
+{{define "content"}}
+<div class="create-trip-container">
+    <div class="create-trip-header">
+        <h1 class="page-title">🚗 Создать поездку</h1>
+        <p class="page-subtitle">Укажите точку отправления на карте и настройте параметры поездки</p>
+    </div>
+
+    <div class="create-trip-layout">
+
+        <!-- Форма -->
+        <div class="card"
+             x-data="tripCreateForm()">
+
+            <form @submit.prevent="submit()" class="create-trip-form-space">
+
+                <!-- Офис назначения -->
+                <div>
+                    <label class="create-trip-label">Офис назначения</label>
+                    <select name="office_id" x-model="officeId" @change="loadOffice()"
+                            id="office-select"
+                            class="input-text">
+                        <option value="">— выберите офис —</option>
+                        {{range .Offices}}
+                        <option value="{{.ID}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+
+                <!-- Точка старта (выбирается на карте) -->
+                <div>
+                    <label class="create-trip-label">Точка отправления</label>
+                    <div class="create-trip-origin-placeholder"
+                         x-show="!originLat">
+                        <p class="create-trip-placeholder-text">👆 Нажмите на карту, чтобы выбрать точку</p>
+                    </div>
+                    <div class="create-trip-origin-selected" x-show="originLat" x-cloak>
+                        <div class="create-trip-origin-info">
+                            <div class="create-trip-origin-line">
+                                <span class="create-trip-origin-dot"></span>
+                                <span class="create-trip-origin-address" x-text="originAddress || (originLat + ', ' + originLng)"></span>
+                            </div>
+                            <p class="create-trip-origin-coords" x-text="originLat + ', ' + originLng"></p>
+                        </div>
+                        <button type="button" 
+                                @click="mapMode = 'origin'" 
+                                class="btn-create-trip-reselect">
+                            Перевыбрать
+                        </button>
+                    </div>
+                    <div class="create-trip-origin-change-hint" x-show="originLat && mapMode === 'origin'" x-cloak>
+                        <span>👉</span> Кликните на карту, чтобы изменить точку отправления
+                    </div>
+                    <input type="hidden" name="origin_lat" x-model="originLat">
+                    <input type="hidden" name="origin_lng" x-model="originLng">
+                    <input type="hidden" name="origin_address" x-model="originAddress">
+                </div>
+
+                <!-- Дата и время -->
+                <div>
+                    <label for="depart-at" class="create-trip-label">Дата и время выезда</label>
+                    <input id="depart-at" type="datetime-local" name="depart_at" x-model="departAt"
+                           :min="minDateTime()"
+                           class="input-text">
+                </div>
+
+                <!-- Промежуточные остановки -->
+                <div class="create-trip-stops-section">
+                    <label class="create-trip-label">Промежуточные остановки (по порядку)</label>
+                    
+                    <div class="create-trip-map-modes">
+                        <button type="button" 
+                                @click="mapMode = 'origin'" 
+                                :class="mapMode === 'origin' ? 'btn-map-mode btn-map-mode-origin-active' : 'btn-map-mode btn-map-mode-inactive'">
+                            📍 Указать старт
+                        </button>
+                        <button type="button" 
+                                @click="mapMode = 'stop'" 
+                                :class="mapMode === 'stop' ? 'btn-map-mode btn-map-mode-stop-active' : 'btn-map-mode btn-map-mode-inactive'">
+                            🚩 Добавить остановку
+                        </button>
+                    </div>
+
+                    <div class="create-trip-stops-edit-list" x-show="stops.length > 0" x-cloak>
+                        <template x-for="(stop, index) in stops" :key="index">
+                            <div class="stop-edit-row">
+                                <span class="stop-edit-index" x-text="index + 1"></span>
+                                <input type="text" x-model="stop.address" 
+                                       class="stop-edit-input" />
+                                <div class="stop-edit-actions">
+                                    <button type="button" @click="moveStop(index, -1)" :disabled="index === 0" class="stop-edit-btn">▲</button>
+                                    <button type="button" @click="moveStop(index, 1)" :disabled="index === stops.length - 1" class="stop-edit-btn">▼</button>
+                                    <button type="button" @click="removeStop(index)" class="stop-edit-btn stop-edit-btn-remove">✕</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <p class="create-trip-stops-hint" x-show="mapMode === 'stop'">
+                        💡 Нажимайте на карту в режиме «Добавить остановку», чтобы отметить промежуточные пункты.
+                    </p>
+                </div>
+
+                <!-- Количество мест -->
+                <div>
+                    <label class="create-trip-label">Мест для пассажиров</label>
+                    <input type="number" x-model.number="seats" min="1" max="20"
+                           class="input-text">
+                </div>
+
+                <!-- Ошибка / Успех -->
+                <div x-show="error" x-cloak class="create-trip-alert-error" x-text="error"></div>
+                <div x-show="success" x-cloak class="create-trip-alert-success" x-text="success"></div>
+
+                <!-- Кнопка -->
+                <button type="submit"
+                        :disabled="!originLat || !officeId || !departAt || loading"
+                        class="btn-primary btn-full">
+                    <span x-show="!loading">🚀 Создать поездку</span>
+                    <span x-show="loading" x-cloak class="flex-center-gap-2">
+                        <svg class="spinner spinner-icon" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Создаём...
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Карта -->
+        <div class="create-trip-map-wrapper">
+            <div id="create-map"></div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+window.AppConfig = {
+    offices: [
+        {{range .Offices}}
+        { id: "{{.ID}}", name: "{{.Name}}", lat: {{.Lat}}, lng: {{.Lng}} },
+        {{end}}
+    ]
+};
+</script>
+<script src="/static/js/trips/create_trip.js?v=1.0.2"></script>
+{{end}}

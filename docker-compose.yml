@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carpooling"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable
+      PORT: 8080
+      JWT_SECRET: dev-secret-change-in-prod-min-32-chars
+      OSRM_BASE_URL: http://router.project-osrm.org
+      ENVIRONMENT: development
+      APP_BASE_URL: http://localhost:8080
+      APP_NAME: "Поездки в офис"
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

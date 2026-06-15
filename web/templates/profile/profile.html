@@ -1,0 +1,83 @@
+{{template "base.html" .}}
+
+{{define "title"}}Профиль — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/profile/profile.css">
+{{end}}
+
+{{define "content"}}
+<div class="profile-container">
+    <h1 class="page-title mb-6">👤 Профиль</h1>
+
+    <div class="card">
+        <!-- Аватар и имя -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <span class="profile-avatar-text">{{slice .User.FullName 0 1}}</span>
+            </div>
+            <div>
+                <h2 class="profile-name">{{.User.FullName}}</h2>
+                <p class="profile-email">{{.User.Email}}</p>
+                <div class="profile-role-badge-container">
+                    {{if eq .User.Role "admin"}}
+                    <span class="badge-role badge-role-admin">🔑 Администратор</span>
+                    {{else if eq .User.Role "driver"}}
+                    <span class="badge-role badge-role-driver">🚗 Водитель</span>
+                    {{else if eq .User.Role "passenger"}}
+                    <span class="badge-role badge-role-passenger">👤 Пассажир</span>
+                    {{else}}
+                    <span class="badge-role badge-role-unverified">⏳ Не верифицирован</span>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Информация -->
+        <dl class="profile-details-list">
+            <div class="profile-detail-row">
+                <dt class="profile-detail-label">Email</dt>
+                <dd class="profile-detail-value">
+                    {{.User.Email}}
+                    {{if .User.EmailVerified}}
+                    <span class="badge-verified">✓ Подтверждён</span>
+                    {{else}}
+                    <span class="badge-unverified">Не подтверждён</span>
+                    {{end}}
+                </dd>
+            </div>
+            {{if .User.Phone}}
+            <div class="profile-detail-row">
+                <dt class="profile-detail-label">Телефон</dt>
+                <dd class="profile-detail-value">{{.User.Phone}}</dd>
+            </div>
+            {{end}}
+            <div class="profile-detail-row">
+                <dt class="profile-detail-label">ID пользователя</dt>
+                <dd class="profile-user-id">{{.User.ID}}</dd>
+            </div>
+        </dl>
+
+        <!-- Статистика -->
+        <div class="profile-stats-section">
+            <div class="profile-stat-card">
+                <span class="profile-stat-icon">🏙️</span>
+                <p class="profile-stat-label">Город</p>
+                <p class="profile-stat-val">
+                    {{if .User.City}}{{.User.City}}{{else}}Не указан{{end}}
+                </p>
+            </div>
+            <div class="profile-stat-card">
+                <span class="profile-stat-icon">
+                    {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}🚗{{else}}🎟️{{end}}
+                </span>
+                <p class="profile-stat-label">
+                    {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}Моих поездок{{else}}Записался{{end}}
+                </p>
+                <p class="profile-stat-val-lg">{{.TripCount}}</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+{{end}}

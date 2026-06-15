@@ -1,0 +1,119 @@
+{{template "base.html" .}}
+
+{{define "title"}}Карта офисов — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/map/map.css?v=1.0.2">
+{{end}}
+
+{{define "content"}}
+<div class="map-container">
+
+    <!-- Заголовок и выбор города -->
+    <div class="trips-header">
+        <div>
+            <h1 class="page-title">🗺️ Карта поездок</h1>
+            <p class="page-subtitle">Офисы и зоны подбора компании</p>
+        </div>
+        <!-- Выбор города -->
+        <div class="city-selector">
+            <button onclick="setCity('moscow')" id="btn-city-moscow"
+                    class="city-tab city-tab-active">
+                Москва
+            </button>
+            <button onclick="setCity('spb')" id="btn-city-spb"
+                    class="city-tab city-tab-inactive">
+                Санкт-Петербург
+            </button>
+        </div>
+    </div>
+
+    <div class="map-layout">
+
+        <!-- Боковая панель -->
+        <div class="map-side-col">
+            <div class="card map-side-header-card">
+                <h1 class="map-side-title">🏢 Офисы компании</h1>
+                <p class="map-side-subtitle">Выберите офис для поиска поездок</p>
+            </div>
+
+            {{if .Offices}}
+            <div class="office-cards-list">
+                <div id="no-offices-placeholder" class="map-empty-placeholder hidden">
+                    <div class="map-empty-icon">🏢</div>
+                    <p class="map-empty-text">В этом городе пока нет офисов</p>
+                </div>
+                {{range .Offices}}
+                {{$city := "moscow"}}{{if gt .Lat 58.0}}{{$city = "spb"}}{{end}}
+                <div class="office-card"
+                     data-office-id="{{.ID}}"
+                     data-lat="{{.Lat}}"
+                     data-lng="{{.Lng}}"
+                     data-name="{{.Name}}"
+                     data-city="{{$city}}"
+                     onclick="selectOffice('{{.ID}}', {{.Lat}}, {{.Lng}}, '{{.Name}}')">
+                    <div class="office-card-header">
+                        <div>
+                            <h3 class="office-card-title">{{.Name}}</h3>
+                            <p class="office-card-address">{{.Address}}</p>
+                        </div>
+                        {{if .IsActive}}
+                        <span class="badge-office-active">
+                            <span class="badge-office-dot"></span>
+                            Активен
+                        </span>
+                        {{else}}
+                        <span class="badge-office-closed">Закрыт</span>
+                        {{end}}
+                    </div>
+                    <div class="office-card-actions">
+                        <a href="/trips?office_id={{.ID}}&date={{now}}"
+                           onclick="event.stopPropagation()"
+                           class="btn-office-search">
+                            🚗 Найти поездки
+                        </a>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="map-empty-placeholder">
+                <div class="map-empty-icon">🏢</div>
+                <p class="map-empty-text">Офисы не добавлены</p>
+                {{if .User}}{{if eq .User.Role "admin"}}
+                <a href="/admin/offices" class="map-empty-link">Добавить офис →</a>
+                {{end}}{{end}}
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Карта -->
+        <div class="map-main-col">
+            <div class="map-wrapper">
+                <div id="main-map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+window.AppConfig = {
+    offices: [
+        {{range .Offices}}
+        {
+            id: "{{.ID}}",
+            name: "{{.Name}}",
+            address: "{{.Address}}",
+            lat: {{.Lat}},
+            lng: {{.Lng}},
+            isActive: {{.IsActive}},
+            zoneGeoJSON: {{if .ZoneGeoJSON}}"{{.ZoneGeoJSON}}"{{else}}null{{end}}
+        },
+        {{end}}
+    ]
+};
+</script>
+<script src="/static/js/map/map.js?v=1.0.2"></script>
+{{end}}

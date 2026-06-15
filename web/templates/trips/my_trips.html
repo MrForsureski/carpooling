@@ -1,0 +1,189 @@
+{{template "base.html" .}}
+
+{{define "title"}}Мои поездки — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/trips/my_trips.css">
+{{end}}
+
+{{define "content"}}
+<div class="my-trips-container" x-data="myTripsPage()">
+
+    <div class="my-trips-header">
+        <div>
+            <h1 class="page-title">📋 Мои поездки</h1>
+            <p class="page-subtitle">
+                {{if eq .User.Role "passenger"}}Поездки, в которых вы участвуете{{else}}История и текущие поездки{{end}}
+            </p>
+        </div>
+        {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
+        <a href="/trips/new" class="btn-primary">
+            ➕ Новая поездка
+        </a>
+        {{end}}
+    </div>
+
+    {{/* ===== ПАССАЖИР: только поездки, к которым присоединился ===== */}}
+    {{if eq .User.Role "passenger"}}
+    {{if .JoinedTrips}}
+    <div class="my-trips-list">
+        {{range .JoinedTrips}}
+        <div class="my-trip-card">
+            <div class="my-trips-card-content">
+                <div class="my-trips-card-header">
+                    <div class="my-trips-driver-box">
+                        <div class="my-trips-driver-avatar">
+                            <span class="my-trips-driver-avatar-text">{{slice .DriverName 0 1}}</span>
+                        </div>
+                        <div>
+                            <p class="my-trips-driver-name">{{.DriverName}}</p>
+                            <p class="my-trips-driver-office">🏢 {{.OfficeName}}</p>
+                        </div>
+                    </div>
+                    <div class="my-trips-time-box">
+                        <p class="trip-card-time">{{formatTime .DepartAt}}</p>
+                        <p class="trip-card-date">{{formatDate .DepartAt}}</p>
+                    </div>
+                </div>
+
+                <div class="my-trips-status-row">
+                    {{if isTripPast .DepartAt .DurationSeconds}}
+                        {{if eq .Status "cancelled"}}
+                        <span class="badge-status badge-cancelled">✕ Отменена</span>
+                        {{else}}
+                        <span class="badge-status badge-completed">✓ Завершена</span>
+                        {{end}}
+                    {{else}}
+                        {{if eq .Status "scheduled"}}
+                        <span class="badge-status badge-scheduled">✓ Запланирована</span>
+                        {{else if eq .Status "in_progress"}}
+                        <span class="badge-status badge-inprogress">🚗 В пути</span>
+                        {{else if eq .Status "completed"}}
+                        <span class="badge-status badge-completed">✓ Завершена</span>
+                        {{else}}
+                        <span class="badge-status badge-cancelled">✕ Отменена</span>
+                        {{end}}
+                    {{end}}
+                    <span class="my-trips-duration">· {{formatDuration .DurationSeconds}} в пути</span>
+                </div>
+
+                {{if .Stops}}
+                <div class="stops-container">
+                    <p class="stops-title">Остановки маршрута</p>
+                    <div class="my-trips-stops-list">
+                        {{range .Stops}}
+                        <div class="stop-row">
+                            <span class="stop-index">{{.SequenceNumber}}</span>
+                            <span class="stop-address">{{.Address}}</span>
+                            <span class="stop-time">{{formatTime .ArrivalTime}}</span>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+
+                <div class="my-trips-card-actions">
+                    <a href="/trips/{{.ID}}"
+                       class="btn-trip-details">
+                        Подробнее →
+                    </a>
+                    {{if and (eq .Status "scheduled") (not (isTripPast .DepartAt .DurationSeconds))}}
+                    <button onclick="leaveTrip('{{.ID}}')"
+                            class="btn-leave-trip">
+                        Покинуть поездку
+                    </button>
+                    {{else}}
+                    <div></div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="my-trips-empty-placeholder">
+        <div class="my-trips-empty-icon">🧑‍💼</div>
+        <h3 class="my-trips-empty-title">Вы ещё не присоединялись к поездкам</h3>
+        <p class="my-trips-empty-subtitle">Найдите удобную поездку и присоединитесь</p>
+        <a href="/trips" class="btn-my-trips-primary">
+            Найти поездку
+        </a>
+    </div>
+    {{end}}
+    {{end}}
+
+    {{/* ===== ВОДИТЕЛЬ / ADMIN: поездки, которые создал ===== */}}
+    {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
+
+    {{if .Trips}}
+    <div class="my-trips-list">
+        {{range .Trips}}
+        <div class="my-trip-card">
+            <div class="my-trips-card-content">
+                <div class="my-trips-card-header">
+                    <div>
+                        <div class="my-trips-title-wrapper">
+                            <h3 class="my-trips-title">{{formatTime .DepartAt}} · {{formatDate .DepartAt}}</h3>
+                            {{if isTripPast .DepartAt .DurationSeconds}}
+                                {{if eq .Status "cancelled"}}
+                                <span class="badge-status badge-cancelled">Отменена</span>
+                                {{else}}
+                                <span class="badge-status badge-completed">Завершена</span>
+                                {{end}}
+                            {{else}}
+                                {{if eq .Status "scheduled"}}
+                                <span class="badge-status badge-scheduled">Запланирована</span>
+                                {{else if eq .Status "in_progress"}}
+                                <span class="badge-status badge-inprogress">В пути</span>
+                                {{else if eq .Status "completed"}}
+                                <span class="badge-status badge-completed">Завершена</span>
+                                {{else}}
+                                <span class="badge-status badge-cancelled">Отменена</span>
+                                {{end}}
+                            {{end}}
+                        </div>
+                        <p class="page-subtitle">
+                            {{if eq $.User.Role "admin"}}🚗 Водитель: <b>{{.DriverName}}</b> · {{end}}🏢 {{.OfficeName}} · 📍 {{.OriginAddress}}
+                        </p>
+                    </div>
+                    <div class="my-trips-seats-box">
+                        <p class="my-trips-seats-count">{{.SeatsLeft}}<span class="my-trips-seats-total">/{{.SeatsTotal}}</span></p>
+                        <p class="my-trips-seats-label">мест</p>
+                    </div>
+                </div>
+                <div class="my-trips-card-actions">
+                    <a href="/trips/{{.ID}}"
+                       class="btn-trip-details">
+                        Подробнее →
+                    </a>
+                    {{if and (eq .Status "scheduled") (not (isTripPast .DepartAt .DurationSeconds))}}
+                    <button onclick="cancelTrip('{{.ID}}')"
+                            class="btn-cancel-trip">
+                        Отменить
+                    </button>
+                    {{else}}
+                    <div class="my-trips-empty-action-placeholder"></div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="my-trips-empty-placeholder">
+        <div class="my-trips-empty-icon">🚗</div>
+        <h3 class="my-trips-empty-title">Вы ещё не создавали поездок</h3>
+        <p class="my-trips-empty-subtitle">Создайте первую поездку и возьмите попутчиков</p>
+        <a href="/trips/new" class="btn-my-trips-primary">
+            Создать поездку
+        </a>
+    </div>
+    {{end}}
+    {{end}}
+
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script src="/static/js/trips/my_trips.js"></script>
+{{end}}

@@ -1,0 +1,234 @@
+{{template "base.html" .}}
+
+{{define "title"}}Поиск поездок — {{.AppName}}{{end}}
+
+{{define "head"}}
+<link rel="stylesheet" href="/static/css/trips/trips_list.css?v=1.0.2">
+{{end}}
+
+{{define "content"}}
+<div class="trips-container" x-data="tripsSearch()">
+
+    <!-- Заголовок и выбор города -->
+    <div class="trips-header">
+        <div>
+            <h1 class="page-title">
+                <span>🚗</span> Поиск поездок
+            </h1>
+            <p class="page-subtitle">Найдите поездки и присоединяйтесь к попутчикам</p>
+        </div>
+        <!-- Выбор города -->
+        <div class="city-selector">
+            <button @click="setCity('moscow')"
+                    :class="currentCity === 'moscow' ? 'city-tab city-tab-active' : 'city-tab city-tab-inactive'">
+                Москва
+            </button>
+            <button @click="setCity('spb')"
+                    :class="currentCity === 'spb' ? 'city-tab city-tab-active' : 'city-tab city-tab-inactive'">
+                Санкт-Петербург
+            </button>
+        </div>
+    </div>
+
+    <!-- Сеточная раскладка: десктоп 2 колонки (50% список/фильтры, 50% липкая карта), мобильный — всё в одну колонку -->
+    <div class="trips-search-layout">
+        
+        <!-- Левая часть: фильтры -->
+        <div class="trips-left-col">
+            <!-- Фильтры -->
+            <div class="card">
+                <div class="filters-grid">
+                    <div>
+                        <label class="filters-label">Офис назначения</label>
+                        <select x-model="filters.officeId"
+                                class="input-text">
+                            <option value="">Все офисы</option>
+                            <template x-for="office in getFilteredOffices()" :key="office.id">
+                                <option :value="office.id" x-text="office.name" :selected="office.id === filters.officeId"></option>
+                            </template>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="filters-label">Дата поездки</label>
+                        <input type="date" x-model="filters.date"
+                               class="input-text">
+                    </div>
+                    <div class="filters-btn-container">
+                        <button @click="search()"
+                                class="btn-primary btn-full">
+                            🔍 Найти поездки
+                        </button>
+                    </div>
+                </div>
+                <div class="notice-box">
+                    <span class="notice-icon">ℹ️</span>
+                    <p class="notice-text">Наведите на поездку — на карте появятся остановки 🟣. Кликните на фиолетовый маркер чтобы присоединиться.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая часть (карта) -->
+        <div class="trips-right-col">
+            <div class="map-card-wrapper">
+                <div id="trips-map"></div>
+            </div>
+        </div>
+
+        <!-- Левая часть: список поездок -->
+        <div id="trips-list" class="trips-list-wrapper">
+            {{if .Trips}}
+            {{range .Trips}}
+            <div class="trip-card"
+                 data-trip-id="{{.ID}}"
+                 data-office-id="{{.OfficeID}}"
+                 data-route='{{.RouteGeoJSON}}'
+                 data-origin-lat="{{.OriginLat}}"
+                 data-origin-lng="{{.OriginLng}}"
+                 onmouseenter="highlightTrip(this)">
+                <div class="p-5">
+                    <div class="driver-profile-header justify-between">
+                        <div class="driver-profile-header">
+                            <div class="driver-avatar">
+                                <span class="driver-avatar-text">{{slice .DriverName 0 1}}</span>
+                            </div>
+                            <div>
+                                <p class="driver-fullname">{{.DriverName}}</p>
+                                <p class="trip-card-subtitle">🏢 {{.OfficeName}}</p>
+                            </div>
+                        </div>
+                        <div class="trip-header-time-box">
+                            <p class="trip-card-time">{{formatTime .DepartAt}}</p>
+                            <p class="trip-card-date">{{formatDate .DepartAt}}</p>
+                        </div>
+                    </div>
+
+                    <div class="trip-stats-grid">
+                        <div class="trip-stat-box">
+                            <p class="trip-stat-label">Мест</p>
+                            <p class="trip-stat-val">{{.SeatsLeft}}/{{.SeatsTotal}}</p>
+                        </div>
+                        <div class="trip-stat-box">
+                            <p class="trip-stat-label">В пути</p>
+                            <p class="trip-stat-val">{{formatDuration .DurationSeconds}}</p>
+                        </div>
+                        <div class="trip-stat-box">
+                            <p class="trip-stat-label">Расстояние</p>
+                            <p class="trip-stat-val">{{formatDistanceInt .DistanceMeters}}</p>
+                        </div>
+                    </div>
+
+                    {{if .Stops}}
+                    <div class="trip-stops-box">
+                        <p class="trip-stops-title">Остановки ({{len .Stops}})</p>
+                        <div class="trip-stops-list">
+                            {{range .Stops}}
+                            <div class="trip-stop-item">
+                                <span class="trip-stop-badge">{{.SequenceNumber}}</span>
+                                <span class="trip-stop-address">{{.Address}}</span>
+                                <span class="trip-stop-time">{{formatTime .ArrivalTime}}</span>
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+                    {{end}}
+
+                    <div class="trip-card-actions">
+                        <a href="/trips/{{.ID}}"
+                           class="btn-trip-details">
+                            Подробнее о поездке →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            
+            <!-- Динамический плейсхолдер для пустого списка после фильтрации -->
+            <div id="no-trips-filtered-placeholder" class="trips-empty-placeholder hidden">
+                <div class="trips-empty-icon">🔍</div>
+                <h3 class="trips-empty-title">Поездки не найдены</h3>
+                <p class="trips-empty-subtitle">Попробуйте другую дату или офис в выбранном городе</p>
+            </div>
+
+            <p id="trips-count-text" class="trips-count-text">Показано {{len .Trips}} из {{.Total}} поездок</p>
+            {{else}}
+            <div class="trips-empty-placeholder">
+                <div class="trips-empty-icon">🔍</div>
+                <h3 class="trips-empty-title">Поездки не найдены</h3>
+                <p class="trips-empty-subtitle">Попробуйте другую дату или офис</p>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения остановки -->
+    <div x-show="joinModal" x-cloak
+         class="join-modal-overlay"
+         @click.self="joinModal = false">
+        <div class="join-modal"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100">
+            <div class="join-modal-header">
+                <div class="join-modal-icon">📍</div>
+                <div>
+                    <h3 class="join-modal-title">Подтвердите остановку</h3>
+                    <p class="join-modal-subtitle">Место посадки в автомобиль</p>
+                </div>
+            </div>
+            <div class="join-modal-detail-card">
+                <div class="join-modal-detail-row">
+                    <div class="join-modal-seq-badge" x-text="selectedStop ? selectedStop.seq : ''"></div>
+                    <div>
+                        <p class="join-modal-stop-address" x-text="selectedStop ? selectedStop.address : ''"></p>
+                        <p class="join-modal-stop-time">🕐 Прибытие: <span x-text="selectedStop ? selectedStop.time : ''"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div x-show="joinError" class="join-modal-error" x-text="joinError"></div>
+            <div class="join-modal-actions">
+                <button @click="joinModal = false"
+                        class="btn-join-modal-cancel">
+                    Отмена
+                </button>
+                <button @click="confirmJoin()"
+                        :disabled="joinLoading"
+                        class="btn-join-modal-confirm">
+                    <span x-show="!joinLoading">✓ Присоединиться</span>
+                    <span x-show="joinLoading" x-cloak>Подключаем...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script>
+window.AppConfig = {
+    officeId: '{{.OfficeID}}',
+    date: '{{.Date}}',
+    offices: [
+        {{range .Offices}}
+        { id: "{{.ID}}", name: "{{.Name}}", lat: {{.Lat}}, lng: {{.Lng}} },
+        {{end}}
+    ],
+    tripStopsMap: {
+        {{range .Trips}}
+        "{{.ID}}": [
+            {{range .Stops}}
+            {
+                id: "{{.ID}}",
+                address: {{.Address}},
+                arrivalTime: "{{formatTime .ArrivalTime}}",
+                sequenceNumber: {{.SequenceNumber}},
+                lat: {{.Lat}},
+                lng: {{.Lng}}
+            },
+            {{end}}
+        ],
+        {{end}}
+    }
+};
+</script>
+<script src="/static/js/trips/trips_list.js?v=1.0.2"></script>
+{{end}}
