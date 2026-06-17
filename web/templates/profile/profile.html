@@ -8,7 +8,7 @@
 
 {{define "content"}}
 <div class="profile-container">
-    <h1 class="page-title mb-6">👤 Профиль</h1>
+    <h1 class="page-title mb-6">Профиль</h1>
 
     <div class="card">
         
@@ -21,13 +21,13 @@
                 <p class="profile-email">{{.User.Email}}</p>
                 <div class="profile-role-badge-container">
                     {{if eq .User.Role "admin"}}
-                    <span class="badge-role badge-role-admin">🔑 Администратор</span>
+                    <span class="badge-role badge-role-admin">Администратор</span>
                     {{else if eq .User.Role "driver"}}
-                    <span class="badge-role badge-role-driver">🚗 Водитель</span>
+                    <span class="badge-role badge-role-driver">Водитель</span>
                     {{else if eq .User.Role "passenger"}}
-                    <span class="badge-role badge-role-passenger">👤 Пассажир</span>
+                    <span class="badge-role badge-role-passenger">Пассажир</span>
                     {{else}}
-                    <span class="badge-role badge-role-unverified">⏳ Не верифицирован</span>
+                    <span class="badge-role badge-role-unverified">Не верифицирован</span>
                     {{end}}
                 </div>
             </div>
@@ -39,7 +39,7 @@
                 <dd class="profile-detail-value">
                     {{.User.Email}}
                     {{if .User.EmailVerified}}
-                    <span class="badge-verified">✓ Подтверждён</span>
+                    <span class="badge-verified">Подтверждён</span>
                     {{else}}
                     <span class="badge-unverified">Не подтверждён</span>
                     {{end}}
@@ -59,7 +59,7 @@
 
         <div class="profile-stats-section">
             <div class="profile-stat-card">
-                <span class="profile-stat-icon">🏙️</span>
+                <span class="profile-stat-icon"></span>
                 <p class="profile-stat-label">Город</p>
                 <p class="profile-stat-val">
                     {{if .User.City}}{{.User.City}}{{else}}Не указан{{end}}
@@ -67,7 +67,7 @@
             </div>
             <div class="profile-stat-card">
                 <span class="profile-stat-icon">
-                    {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}🚗{{else}}🎟️{{end}}
+                    {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}{{else}}{{end}}
                 </span>
                 <p class="profile-stat-label">
                     {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}Моих поездок{{else}}Записался{{end}}

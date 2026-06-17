@@ -10,12 +10,12 @@
 <div class="admin-container" x-data="officesAdmin()">
     <div class="admin-header-row">
         <div>
-            <h1 class="page-title">🏢 Офисы</h1>
+            <h1 class="page-title">Офисы</h1>
             <p class="page-subtitle">Управление офисами и зонами подбора</p>
         </div>
         <button @click="showCreateModal = true"
                 class="btn-primary">
-            ➕ Добавить офис
+            Добавить офис
         </button>
     </div>
 
@@ -26,7 +26,7 @@
             <div class="admin-office-card-header">
                 <div>
                     <h3 class="admin-office-name">{{.Name}}</h3>
-                    <p class="admin-office-address">📍 {{.Address}}</p>
+                    <p class="admin-office-address"> {{.Address}}</p>
                     <p class="admin-office-coords">{{.Lat}}, {{.Lng}}</p>
                 </div>
                 {{if .IsActive}}
@@ -38,11 +38,11 @@
             <div class="admin-office-card-actions">
                 <button @click="openZoneModal('{{.ID}}')"
                         class="btn-office-action-zone">
-                    ⚙️ Настроить зону
+                    Настроить зону
                 </button>
                 <button onclick="deactivateOffice('{{.ID}}')"
                         class="btn-office-action-deactivate">
-                    🗑 Деактивировать
+                    Деактивировать
                 </button>
             </div>
         </div>
@@ -50,7 +50,7 @@
     </div>
     {{else}}
     <div class="admin-empty-state">
-        <div class="admin-empty-icon">🏢</div>
+        <div class="admin-empty-icon"></div>
         <h3 class="admin-empty-title">Офисов нет</h3>
         <button @click="showCreateModal = true" class="admin-empty-link">
             Добавить первый офис →

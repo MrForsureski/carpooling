@@ -49,7 +49,7 @@ function updateMapMarkers() {
                     <p style="font-size:12px;color:#64748b;margin:0 0 10px">${office.address}</p>
                     <a href="/trips?office_id=${office.id}"
                        style="display:block;text-align:center;background:linear-gradient(135deg,#6366f1,#a855f7);color:white;padding:8px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
-                        🚗 Найти поездки
+                        Найти поездки
                     </a>
                 </div>
             `);

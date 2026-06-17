@@ -33,10 +33,10 @@ function makeCircleIcon(bg, content, shadow) {
 
 //маркер
 L.marker([trip.originLat, trip.originLng], {
-    icon: makeCircleIcon('linear-gradient(135deg,#2563eb,#1d4ed8)', '🚌', 'rgba(37,99,235,0.45)')
+    icon: makeCircleIcon('linear-gradient(135deg,#2563eb,#1d4ed8)', 'A', 'rgba(37,99,235,0.45)')
 }).addTo(map).bindPopup(`
     <div style="font-family:Inter,sans-serif;min-width:150px">
-        <b style="color:#2563eb">📍 Начало маршрута</b><br>
+        <b style="color:#2563eb">Начало маршрута</b><br>
         <span style="font-size:12px;color:#475569">Точка отправления водителя</span>
     </div>`);
 
@@ -51,9 +51,9 @@ trip.stops.forEach(s => {
     if (isUserStop) {
         popupContent = `
             <div style="font-family:Inter,sans-serif;min-width:190px">
-                <div style="font-weight:700;color:#059669;margin-bottom:3px">🟢 Ваша остановка (посадка)</div>
-                <div style="font-weight:700;color:#6366f1;margin-bottom:3px">🕐 ${s.arrivalTime}</div>
-                <div style="font-size:12px;color:#475569;margin-bottom:8px">📍 ${s.address}</div>
+                <div style="font-weight:700;color:#059669;margin-bottom:3px"> Ваша остановка (посадка)</div>
+                <div style="font-weight:700;color:#6366f1;margin-bottom:3px">Прибытие: ${s.arrivalTime}</div>
+                <div style="font-size:12px;color:#475569;margin-bottom:8px">${s.address}</div>
                 <button disabled style="display:block;width:100%;padding:7px 0;background:#f1f5f9;color:#94a3b8;border:none;border-radius:10px;font-weight:600;font-size:12px;cursor:not-allowed">
                     Вы здесь садитесь
                 </button>
@@ -61,8 +61,8 @@ trip.stops.forEach(s => {
     } else {
         popupContent = `
             <div style="font-family:Inter,sans-serif;min-width:190px">
-                <div style="font-weight:700;color:#6366f1;margin-bottom:3px">🕐 ${s.arrivalTime}</div>
-                <div style="font-size:12px;color:#475569;margin-bottom:8px">📍 ${s.address}</div>
+                <div style="font-weight:700;color:#6366f1;margin-bottom:3px">Прибытие: ${s.arrivalTime}</div>
+                <div style="font-size:12px;color:#475569;margin-bottom:8px">${s.address}</div>
                 <button onclick="selectStopFromMap('${s.id}','${s.address}','${s.arrivalTime}',${s.seq})"
                     style="display:block;width:100%;padding:7px 0;background:linear-gradient(135deg,#6366f1,#9333ea);color:white;border:none;border-radius:10px;font-weight:600;font-size:12px;cursor:pointer">
                     Выбрать эту остановку
@@ -88,10 +88,10 @@ try {
     if (geom && geom.coordinates && geom.coordinates.length > 0) {
         const last = geom.coordinates[geom.coordinates.length - 1];
         L.marker([last[1], last[0]], {
-            icon: makeCircleIcon('linear-gradient(135deg,#ef4444,#dc2626)', '🏢', 'rgba(239,68,68,0.45)')
+            icon: makeCircleIcon('linear-gradient(135deg,#ef4444,#dc2626)', 'B', 'rgba(239,68,68,0.45)')
         }).addTo(map).bindPopup(`
             <div style="font-family:Inter,sans-serif;min-width:150px">
-                <b style="color:#dc2626">🏢 Офис (финиш)</b><br>
+                <b style="color:#dc2626"> Офис (финиш)</b><br>
                 <span style="font-size:12px;color:#475569">Конечная точка маршрута</span>
             </div>`);
     }
@@ -152,7 +152,7 @@ function tripDetail() {
                     return;
                 }
                 window.dispatchEvent(new CustomEvent('notify', {
-                    detail: { type: 'success', message: '🎉 Остановка успешно изменена!' }
+                    detail: { type: 'success', message: 'Остановка успешно изменена!' }
                 }));
                 setTimeout(() => location.reload(), 1500);
             } catch(e) {
@@ -181,7 +181,7 @@ function tripDetail() {
                     return;
                 }
                 window.dispatchEvent(new CustomEvent('notify', {
-                    detail: { type: 'success', message: '🎉 Вы успешно присоединились к поездке!' }
+                    detail: { type: 'success', message: 'Вы успешно присоединились к поездке!' }
                 }));
                 setTimeout(() => location.reload(), 1500);
             } catch(e) {

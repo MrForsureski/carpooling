@@ -77,10 +77,10 @@ function highlightTrip(card) {
     const originLng = parseFloat(card.dataset.originLng);
     if (!isNaN(originLat) && !isNaN(originLng)) {
         const m = L.marker([originLat, originLng], {
-            icon: makeCircleIcon('linear-gradient(135deg,#10b981,#059669)', '🏠', 'rgba(16,185,129,0.45)')
+            icon: makeCircleIcon('linear-gradient(135deg,#10b981,#059669)', 'A', 'rgba(16,185,129,0.45)')
         }).addTo(map).bindPopup(`
             <div class="origin-popup" style="font-family:Inter,sans-serif;min-width:150px">
-                <b>📍 Начало маршрута</b><br>
+                <b>Начало маршрута</b><br>
                 <span style="font-size:12px;color:#475569">Точка отправления водителя</span>
             </div>`);
         stopMarkers.push(m);
@@ -93,8 +93,8 @@ function highlightTrip(card) {
             icon: makeCircleIcon('linear-gradient(135deg,#6366f1,#9333ea)', stop.sequenceNumber, 'rgba(99,102,241,0.45)')
         }).addTo(map).bindPopup(`
             <div class="stop-popup">
-                <div class="stop-popup-time">🕐 ${stop.arrivalTime}</div>
-                <div class="stop-popup-addr">📍 ${stop.address}</div>
+                <div class="stop-popup-time">Прибытие: ${stop.arrivalTime}</div>
+                <div class="stop-popup-addr">${stop.address}</div>
                 <button class="stop-popup-btn"
                     onclick="selectStopFromMap('${tripId}','${stop.id}','${stop.address.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}','${stop.arrivalTime}',${stop.sequenceNumber})">
                     Присоединиться здесь
@@ -109,10 +109,10 @@ function highlightTrip(card) {
         if (geom && geom.coordinates && geom.coordinates.length > 0) {
             const last = geom.coordinates[geom.coordinates.length - 1];
             const m = L.marker([last[1], last[0]], {
-                icon: makeCircleIcon('linear-gradient(135deg,#ef4444,#dc2626)', '🏢', 'rgba(239,68,68,0.45)')
+                icon: makeCircleIcon('linear-gradient(135deg,#ef4444,#dc2626)', 'B', 'rgba(239,68,68,0.45)')
             }).addTo(map).bindPopup(`
                 <div class="dest-popup" style="font-family:Inter,sans-serif;min-width:150px">
-                    <b>🏢 Офис (финиш)</b><br>
+                    <b> Офис (финиш)</b><br>
                     <span style="font-size:12px;color:#475569">Конечная точка маршрута</span>
                 </div>`);
             stopMarkers.push(m);
@@ -276,7 +276,7 @@ function tripsSearch() {
                 }
                 this.joinModal = false;
                 window.dispatchEvent(new CustomEvent('notify', {
-                    detail: { type: 'success', message: '🎉 Вы успешно присоединились к поездке!' }
+                    detail: { type: 'success', message: 'Вы успешно присоединились к поездке!' }
                 }));
                 setTimeout(() => window.location.reload(), 2000);
             } catch(e) {

@@ -35,9 +35,9 @@
                         </div>
                     </div>
                     {{if eq .Trip.Status "cancelled"}}
-                    <span class="badge-status-lg badge-status-lg-cancelled">✗ Отменена</span>
+                    <span class="badge-status-lg badge-status-lg-cancelled">Отменена</span>
                     {{else if isTripPast .Trip.DepartAt .Trip.DurationSeconds}}
-                    <span class="badge-status-lg badge-status-lg-completed">✓ Завершена</span>
+                    <span class="badge-status-lg badge-status-lg-completed">Завершена</span>
                     {{else if eq .Trip.Status "scheduled"}}
                     <span class="badge-status-lg badge-status-lg-scheduled">
                         <span class="status-pulse-dot bg-emerald-550"></span>Запланирована
@@ -47,7 +47,7 @@
                         <span class="status-pulse-dot bg-blue-550"></span>В пути
                     </span>
                     {{else if eq .Trip.Status "completed"}}
-                    <span class="badge-status-lg badge-status-lg-completed">✓ Завершена</span>
+                    <span class="badge-status-lg badge-status-lg-completed">Завершена</span>
                     {{end}}
                 </div>
 
@@ -55,7 +55,7 @@
                     
                     <div class="route-main-row">
                         <div class="route-dot-icon bg-blue-600 ring-blue-100">
-                            <span class="route-dot-emoji">🚌</span>
+                            <span class="route-dot-emoji"></span>
                         </div>
                         <div class="route-info">
                             <p class="route-label">Отправление</p>
@@ -102,7 +102,7 @@
                     
                     <div class="route-main-row">
                         <div class="route-dot-icon bg-red-500 ring-red-100">
-                            <span class="route-dot-emoji">🏢</span>
+                            <span class="route-dot-emoji"></span>
                         </div>
                         <div class="route-info">
                             <p class="route-label">Назначение (офис)</p>
@@ -183,14 +183,14 @@
                         </select>
                         {{else}}
                         <div class="detail-alert-warning">
-                            ⚠️ У этого маршрута нет промежуточных остановок. Уточните у водителя.
+                            У этого маршрута нет промежуточных остановок. Уточните у водителя.
                         </div>
                         {{end}}
                     </div>
                     <button @click="join()"
                             :disabled="!selectedStopID || joining"
                             class="btn-primary btn-full">
-                        <span x-show="!joining">🚗 Присоединиться</span>
+                        <span x-show="!joining">Присоединиться</span>
                         <span x-show="joining" x-cloak>Подключаем...</span>
                     </button>
                     {{end}}
@@ -199,7 +199,7 @@
             {{end}}
 
             <div class="side-card">
-                <h3 class="side-card-title">👥 Пассажиры
+                <h3 class="side-card-title">Пассажиры
                     <span class="side-card-title-count">({{len .Passengers}})</span>
                 </h3>
                 {{if .Passengers}}
@@ -211,7 +211,7 @@
                         </div>
                         <div class="passenger-info">
                             <p class="passenger-name">{{.UserFullName}}</p>
-                            <p class="passenger-stop">📍 {{.PickupAddress}}</p>
+                            <p class="passenger-stop">{{.PickupAddress}}</p>
                         </div>
                         {{if eq $.CurrentUser .UserID.String}}
                         <span class="badge-passenger-self">Вы</span>

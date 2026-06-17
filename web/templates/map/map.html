@@ -11,7 +11,7 @@
 
     <div class="trips-header">
         <div>
-            <h1 class="page-title">🗺️ Карта поездок</h1>
+            <h1 class="page-title">Карта поездок</h1>
             <p class="page-subtitle">Офисы и зоны подбора компании</p>
         </div>
         
@@ -31,14 +31,14 @@
 
         <div class="map-side-col">
             <div class="card map-side-header-card">
-                <h1 class="map-side-title">🏢 Офисы компании</h1>
+                <h1 class="map-side-title">Офисы компании</h1>
                 <p class="map-side-subtitle">Выберите офис для поиска поездок</p>
             </div>
 
             {{if .Offices}}
             <div class="office-cards-list">
                 <div id="no-offices-placeholder" class="map-empty-placeholder hidden">
-                    <div class="map-empty-icon">🏢</div>
+                    <div class="map-empty-icon"></div>
                     <p class="map-empty-text">В этом городе пока нет офисов</p>
                 </div>
                 {{range .Offices}}
@@ -68,7 +68,7 @@
                         <a href="/trips?office_id={{.ID}}&date={{now}}"
                            onclick="event.stopPropagation()"
                            class="btn-office-search">
-                            🚗 Найти поездки
+                            Найти поездки
                         </a>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
             </div>
             {{else}}
             <div class="map-empty-placeholder">
-                <div class="map-empty-icon">🏢</div>
+                <div class="map-empty-icon"></div>
                 <p class="map-empty-text">Офисы не добавлены</p>
                 {{if .User}}{{if eq .User.Role "admin"}}
                 <a href="/admin/offices" class="map-empty-link">Добавить офис →</a>

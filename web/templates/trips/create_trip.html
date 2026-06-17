@@ -9,7 +9,7 @@
 {{define "content"}}
 <div class="create-trip-container">
     <div class="create-trip-header">
-        <h1 class="page-title">🚗 Создать поездку</h1>
+        <h1 class="page-title">Создать поездку</h1>
         <p class="page-subtitle">Укажите точку отправления на карте и настройте параметры поездки</p>
     </div>
 
@@ -36,7 +36,7 @@
                     <label class="create-trip-label">Точка отправления</label>
                     <div class="create-trip-origin-placeholder"
                          x-show="!originLat">
-                        <p class="create-trip-placeholder-text">👆 Нажмите на карту, чтобы выбрать точку</p>
+                        <p class="create-trip-placeholder-text">Нажмите на карту, чтобы выбрать точку</p>
                     </div>
                     <div class="create-trip-origin-selected" x-show="originLat" x-cloak>
                         <div class="create-trip-origin-info">
@@ -53,7 +53,7 @@
                         </button>
                     </div>
                     <div class="create-trip-origin-change-hint" x-show="originLat && mapMode === 'origin'" x-cloak>
-                        <span>👉</span> Кликните на карту, чтобы изменить точку отправления
+                        Кликните на карту, чтобы изменить точку отправления
                     </div>
                     <input type="hidden" name="origin_lat" x-model="originLat">
                     <input type="hidden" name="origin_lng" x-model="originLng">
@@ -74,12 +74,12 @@
                         <button type="button" 
                                 @click="mapMode = 'origin'" 
                                 :class="mapMode === 'origin' ? 'btn-map-mode btn-map-mode-origin-active' : 'btn-map-mode btn-map-mode-inactive'">
-                            📍 Указать старт
+                            Указать старт
                         </button>
                         <button type="button" 
                                 @click="mapMode = 'stop'" 
                                 :class="mapMode === 'stop' ? 'btn-map-mode btn-map-mode-stop-active' : 'btn-map-mode btn-map-mode-inactive'">
-                            🚩 Добавить остановку
+                            Добавить остановку
                         </button>
                     </div>
 
@@ -99,7 +99,7 @@
                     </div>
                     
                     <p class="create-trip-stops-hint" x-show="mapMode === 'stop'">
-                        💡 Нажимайте на карту в режиме «Добавить остановку», чтобы отметить промежуточные пункты.
+                        Нажимайте на карту в режиме «Добавить остановку», чтобы отметить промежуточные пункты.
                     </p>
                 </div>
 
@@ -115,7 +115,7 @@
                 <button type="submit"
                         :disabled="!originLat || !officeId || !departAt || loading"
                         class="btn-primary btn-full">
-                    <span x-show="!loading">🚀 Создать поездку</span>
+                    <span x-show="!loading">Создать поездку</span>
                     <span x-show="loading" x-cloak class="flex-center-gap-2">
                         <svg class="spinner spinner-icon" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                         Создаём...

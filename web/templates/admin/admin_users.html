@@ -10,7 +10,7 @@
 <div class="admin-container" x-data="usersAdmin()">
     <div class="admin-header-row">
         <div>
-            <h1 class="page-title">👥 Пользователи</h1>
+            <h1 class="page-title">Пользователи</h1>
             <p class="page-subtitle">Всего: {{.Total}} пользователей</p>
         </div>
         <a href="/admin" class="admin-back-link">← Панель</a>
@@ -52,9 +52,9 @@
                     </td>
                     <td>
                         {{if .EmailVerified}}
-                        <span class="admin-text-success">✓ Email подтверждён</span>
+                        <span class="admin-text-success">Email подтверждён</span>
                         {{else}}
-                        <span class="admin-text-warning">⚠ Не подтверждён</span>
+                        <span class="admin-text-warning">Не подтверждён</span>
                         {{end}}
                     </td>
                     <td>

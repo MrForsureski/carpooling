@@ -12,7 +12,7 @@
     <div class="trips-header">
         <div>
             <h1 class="page-title">
-                <span>🚗</span> Поиск поездок
+                <span></span> Поиск поездок
             </h1>
             <p class="page-subtitle">Найдите поездки и присоединяйтесь к попутчикам</p>
         </div>
@@ -53,13 +53,13 @@
                     <div class="filters-btn-container">
                         <button @click="search()"
                                 class="btn-primary btn-full">
-                            🔍 Найти поездки
+                            Найти поездки
                         </button>
                     </div>
                 </div>
                 <div class="notice-box">
-                    <span class="notice-icon">ℹ️</span>
-                    <p class="notice-text">Наведите на поездку — на карте появятся остановки 🟣. Кликните на фиолетовый маркер чтобы присоединиться.</p>
+                    <span class="notice-icon">i</span>
+                    <p class="notice-text">Наведите на поездку — на карте появятся остановки с номерами. Кликните на фиолетовый маркер чтобы присоединиться.</p>
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@
                             </div>
                             <div>
                                 <p class="driver-fullname">{{.DriverName}}</p>
-                                <p class="trip-card-subtitle">🏢 {{.OfficeName}}</p>
+                                <p class="trip-card-subtitle">{{.OfficeName}}</p>
                             </div>
                         </div>
                         <div class="trip-header-time-box">
@@ -138,7 +138,7 @@
             {{end}}
 
             <div id="no-trips-filtered-placeholder" class="trips-empty-placeholder hidden">
-                <div class="trips-empty-icon">🔍</div>
+                <div class="trips-empty-icon"></div>
                 <h3 class="trips-empty-title">Поездки не найдены</h3>
                 <p class="trips-empty-subtitle">Попробуйте другую дату или офис в выбранном городе</p>
             </div>
@@ -146,7 +146,7 @@
             <p id="trips-count-text" class="trips-count-text">Показано {{len .Trips}} из {{.Total}} поездок</p>
             {{else}}
             <div class="trips-empty-placeholder">
-                <div class="trips-empty-icon">🔍</div>
+                <div class="trips-empty-icon"></div>
                 <h3 class="trips-empty-title">Поездки не найдены</h3>
                 <p class="trips-empty-subtitle">Попробуйте другую дату или офис</p>
             </div>
@@ -162,7 +162,7 @@
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100">
             <div class="join-modal-header">
-                <div class="join-modal-icon">📍</div>
+                <div class="join-modal-icon"></div>
                 <div>
                     <h3 class="join-modal-title">Подтвердите остановку</h3>
                     <p class="join-modal-subtitle">Место посадки в автомобиль</p>
@@ -173,7 +173,7 @@
                     <div class="join-modal-seq-badge" x-text="selectedStop ? selectedStop.seq : ''"></div>
                     <div>
                         <p class="join-modal-stop-address" x-text="selectedStop ? selectedStop.address : ''"></p>
-                        <p class="join-modal-stop-time">🕐 Прибытие: <span x-text="selectedStop ? selectedStop.time : ''"></span></p>
+                        <p class="join-modal-stop-time">Прибытие: <span x-text="selectedStop ? selectedStop.time : ''"></span></p>
                     </div>
                 </div>
             </div>
@@ -186,7 +186,7 @@
                 <button @click="confirmJoin()"
                         :disabled="joinLoading"
                         class="btn-join-modal-confirm">
-                    <span x-show="!joinLoading">✓ Присоединиться</span>
+                    <span x-show="!joinLoading">Присоединиться</span>
                     <span x-show="joinLoading" x-cloak>Подключаем...</span>
                 </button>
             </div>

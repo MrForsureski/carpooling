@@ -14,23 +14,23 @@
 
             <div class="nav-links">
                 <a href="/map" class="nav-link">
-                    🗺️ Карта
+                    Карта
                 </a>
                 <a href="/trips" class="nav-link">
-                    🚗 Поездки
+                     Поездки
                 </a>
                 {{if .User}}
                     {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
                     <a href="/trips/new" class="nav-link">
-                        ➕ Создать поездку
+                        Создать поездку
                     </a>
                     {{end}}
                     <a href="/trips/my" class="nav-link">
-                        📋 Мои поездки
+                        Мои поездки
                     </a>
                     {{if eq .User.Role "admin"}}
                     <a href="/admin" class="nav-link">
-                        ⚙️ Админ
+                        Админ
                     </a>
                     {{end}}
                     
@@ -48,10 +48,10 @@
                             <div class="dropdown-header">
                                 <p class="dropdown-email">{{.User.Email}}</p>
                                 <p class="dropdown-role">
-                                    {{if eq .User.Role "admin"}}🔑 Администратор
-                                    {{else if eq .User.Role "driver"}}🚗 Водитель
-                                    {{else if eq .User.Role "passenger"}}👤 Пассажир
-                                    {{else}}⏳ Не верифицирован{{end}}
+                                    {{if eq .User.Role "admin"}}Администратор
+                                    {{else if eq .User.Role "driver"}}Водитель
+                                    {{else if eq .User.Role "passenger"}}Пассажир
+                                    {{else}}Не верифицирован{{end}}
                                 </p>
                             </div>
                             <a href="/profile" class="dropdown-item">Профиль</a>
@@ -79,14 +79,14 @@
     </div>
 
     <div x-show="mobileOpen" x-cloak x-transition class="mobile-menu">
-        <a href="/map" class="mobile-menu-link">🗺️ Карта</a>
-        <a href="/trips" class="mobile-menu-link">🚗 Поездки</a>
+        <a href="/map" class="mobile-menu-link">Карта</a>
+        <a href="/trips" class="mobile-menu-link"> Поездки</a>
         {{if .User}}
-            <a href="/trips/my" class="mobile-menu-link">📋 Мои поездки</a>
+            <a href="/trips/my" class="mobile-menu-link">Мои поездки</a>
             {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
-            <a href="/trips/new" class="mobile-menu-link">➕ Создать поездку</a>
+            <a href="/trips/new" class="mobile-menu-link">Создать поездку</a>
             {{end}}
-            <a href="/profile" class="mobile-menu-link">👤 Профиль</a>
+            <a href="/profile" class="mobile-menu-link">Профиль</a>
             <button hx-post="/auth/logout" class="mobile-menu-link mobile-menu-logout">Выйти</button>
         {{else}}
             <a href="/login" class="mobile-menu-link">Войти</a>
