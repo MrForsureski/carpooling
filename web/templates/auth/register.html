@@ -65,7 +65,7 @@
                 <div x-show="success" x-cloak class="auth-alert-success" x-text="success"></div>
 
                 <button type="submit"
-                        :disabled="loading || success"
+                        :disabled="loading || !!success"
                         class="btn-primary">
                     <span x-show="!loading">Создать аккаунт</span>
                     <span x-show="loading" x-cloak class="flex-center-gap-2">
