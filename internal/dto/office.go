@@ -1,6 +1,6 @@
 package dto
 
-// CreateOfficeRequest — запрос на создание офиса
+// Createofficerequest запрос на создание офиса
 type CreateOfficeRequest struct {
 	Name    string  `json:"name"    validate:"required,min=2,max=255"`
 	Address string  `json:"address" validate:"required,min=5,max=500"`
@@ -8,7 +8,7 @@ type CreateOfficeRequest struct {
 	Lng     float64 `json:"lng"     validate:"required,longitude"`
 }
 
-// CreateZoneRequest — запрос на создание зоны офиса
+// createzonerequest запрос на создание зоны офиса
 type CreateZoneRequest struct {
 	PickupZone         map[string]interface{} `json:"pickup_zone"          validate:"required"`
 	MaxDetourMinutes   int                    `json:"max_detour_minutes"   validate:"min=1,max=60"`
@@ -18,7 +18,7 @@ type CreateZoneRequest struct {
 	MaxSeats           int                    `json:"max_seats"            validate:"min=1,max=20"`
 }
 
-// UpdateZoneRequest — обновление ограничений зоны
+// updatezonerequest обновление ограничений зоны
 type UpdateZoneRequest struct {
 	MaxDetourMinutes  *int `json:"max_detour_minutes"   validate:"omitempty,min=1,max=60"`
 	MaxDistanceMeters *int `json:"max_distance_meters"  validate:"omitempty,min=100,max=10000"`

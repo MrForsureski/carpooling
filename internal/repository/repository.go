@@ -9,7 +9,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// UserRepository — интерфейс для работы с пользователями
+// Userrepository интерфейс для работы с пользователями
 type UserRepository interface {
 	Create(ctx context.Context, user *model.User) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.User, error)
@@ -23,7 +23,7 @@ type UserRepository interface {
 	GetCompanyByEmailDomain(ctx context.Context, domain string) (*model.Company, error)
 }
 
-// OfficeRepository — интерфейс для работы с офисами
+//Officerepository интерфейс для работы с офисами
 type OfficeRepository interface {
 	Create(ctx context.Context, office *model.Office) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Office, error)
@@ -37,7 +37,7 @@ type OfficeRepository interface {
 	FindZoneContainingPoint(ctx context.Context, officeID uuid.UUID, lat, lng float64) (*model.OfficeZone, error)
 }
 
-// TripRepository — интерфейс для работы с поездками
+//triprepository интерфейс для работы с поездками
 type TripRepository interface {
 	Create(ctx context.Context, trip *model.Trip) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Trip, error)

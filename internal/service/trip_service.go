@@ -35,7 +35,7 @@ func NewTripService(
 	}
 }
 
-// CreateTrip создаёт новую поездку
+// Createtrip создание новой поездки
 func (s *TripService) CreateTrip(ctx context.Context, driverID uuid.UUID, req dto.CreateTripRequest) (*model.Trip, error) {
 	officeID, err := uuid.Parse(req.OfficeID)
 	if err != nil {
@@ -47,18 +47,18 @@ func (s *TripService) CreateTrip(ctx context.Context, driverID uuid.UUID, req dt
 		return nil, fmt.Errorf("invalid depart_at format (use RFC3339): %w", err)
 	}
 
-	// 1. Проверяем минимальное время до старта (60 мин)
+	// Проверка минимального времени до старта 60 минут
 	if time.Until(departAt) < 60*time.Minute {
 		return nil, model.ErrTooSoonToCreate
 	}
 
-	// 2. Проверяем, что точка старта в зоне офиса
+	//проверка нахождения точки старта в зоне офиса
 	zone, err := s.officeRepo.FindZoneContainingPoint(ctx, officeID, req.OriginLat, req.OriginLng)
 	if err != nil {
 		return nil, model.ErrOriginOutsideZone
 	}
 
-	// 3. Проверяем, нет ли конфликта по расписанию у водителя
+	// Проверка отсутствия конфликта по расписанию у водителя
 	conflict, err := s.tripRepo.HasDriverConflict(ctx, driverID, departAt)
 	if err != nil {
 		return nil, err
@@ -67,13 +67,13 @@ func (s *TripService) CreateTrip(ctx context.Context, driverID uuid.UUID, req dt
 		return nil, model.ErrDriverConflict
 	}
 
-	// 4. Получаем офис для координат назначения
+	//Получение офиса для координат назначения
 	office, err := s.officeRepo.GetByID(ctx, officeID)
 	if err != nil {
 		return nil, err
 	}
 
-	// 5. Запрашиваем маршрут у OSRM через все остановки
+	//запрос маршрута у osrm через все остановки
 	points := make([]float64, 0, 4+len(req.Stops)*2)
 	points = append(points, req.OriginLat, req.OriginLng)
 	for _, stop := range req.Stops {
@@ -86,8 +86,8 @@ func (s *TripService) CreateTrip(ctx context.Context, driverID uuid.UUID, req dt
 		return nil, fmt.Errorf("routing service error: %w", err)
 	}
 
-	// Коэффициент замедления для реального маршрута (пробки, остановки, автобусный режим)
-	// OSRM рассчитывает для легкового авто на пустой дороге, ×1.4 даёт реалистичное время
+	//Коэффициент замедления для реального маршрута
+	//Osrm расчет для легкового авто умноженный на коэффициент
 	const busSlowdownFactor = 1.4
 	adjustedDuration := int(float64(route.DurationSeconds) * busSlowdownFactor)
 	adjustedLegDurations := make([]int, len(route.LegDurations))
@@ -117,7 +117,7 @@ func (s *TripService) CreateTrip(ctx context.Context, driverID uuid.UUID, req dt
 		return nil, err
 	}
 
-	// 6. Создаем остановки
+	//создание остановок
 	accumulatedDuration := 0
 	tripStops := make([]*model.TripStop, len(req.Stops))
 	for i, rStop := range req.Stops {
@@ -144,17 +144,17 @@ func (s *TripService) CreateTrip(ctx context.Context, driverID uuid.UUID, req dt
 	return trip, nil
 }
 
-// JoinTrip — присоединение пассажира к поездке
+// Jointrip присоединение пассажира к поездке
 func (s *TripService) JoinTrip(ctx context.Context, passengerID uuid.UUID, tripID uuid.UUID, req dto.JoinTripRequest) (*model.TripPassenger, error) {
 	var passenger *model.TripPassenger
 	err := s.txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		// Получаем поездку (с FOR UPDATE т.к. мы в транзакции!)
+		// Получение поездки с block for update в транзакции
 		trip, err := s.tripRepo.GetForUpdate(txCtx, tripID)
 		if err != nil {
 			return model.ErrTripNotFound
 		}
 
-		// Загружаем зону ограничений
+		// Загрузка зоны
 		var zone *model.OfficeZone
 		if trip.ZoneID != nil {
 			zone, _ = s.officeRepo.GetZoneByOffice(txCtx, trip.OfficeID)
@@ -170,7 +170,7 @@ func (s *TripService) JoinTrip(ctx context.Context, passengerID uuid.UUID, tripI
 		}
 		trip.Zone = zone
 
-		// Проверка — уже в поездке?
+		// Проверка нахождения в поездке
 		alreadyIn, _ := s.tripRepo.IsPassengerInTrip(txCtx, tripID, passengerID)
 		if alreadyIn {
 			stopID, err := uuid.Parse(req.StopID)
@@ -198,18 +198,18 @@ func (s *TripService) JoinTrip(ctx context.Context, passengerID uuid.UUID, tripI
 			return nil
 		}
 
-		// --- Использование богатой доменной модели ---
+		//Использование доменной модели
 		if err := trip.CanJoin(passengerID); err != nil {
 			return err
 		}
 
-		// Проверка конфликта расписания у пассажира
+		//Проверка конфликта расписания у пассажира
 		conflict, _ := s.tripRepo.HasPassengerConflict(txCtx, passengerID, trip.DepartAt)
 		if conflict {
 			return model.ErrSchedulingConflict
 		}
 
-		// Получаем остановку
+		//Получение остановки
 		stopID, err := uuid.Parse(req.StopID)
 		if err != nil {
 			return fmt.Errorf("invalid stop_id: %w", err)
@@ -220,7 +220,7 @@ func (s *TripService) JoinTrip(ctx context.Context, passengerID uuid.UUID, tripI
 			return model.ErrStopNotFound
 		}
 
-		// --- Всё проверено, создаём запись ---
+		//создание записи
 		passenger = &model.TripPassenger{
 			ID:            uuid.New(),
 			TripID:        tripID,
@@ -251,7 +251,7 @@ func (s *TripService) JoinTrip(ctx context.Context, passengerID uuid.UUID, tripI
 	return passenger, nil
 }
 
-// LeaveTrip — пассажир покидает поездку
+//leavetrip выход пассажира из поездки
 func (s *TripService) LeaveTrip(ctx context.Context, passengerID uuid.UUID, tripID uuid.UUID) error {
 	trip, err := s.tripRepo.GetByID(ctx, tripID)
 	if err != nil {
@@ -262,7 +262,7 @@ func (s *TripService) LeaveTrip(ctx context.Context, passengerID uuid.UUID, trip
 		return model.ErrTripNotScheduled
 	}
 
-	// Загружаем зону для ограничений
+	// загрузка зоны
 	zone, _ := s.officeRepo.GetZoneByOffice(ctx, trip.OfficeID)
 	minCancel := 30
 	if zone != nil {
@@ -286,7 +286,7 @@ func (s *TripService) LeaveTrip(ctx context.Context, passengerID uuid.UUID, trip
 	return nil
 }
 
-// CancelTrip — водитель или admin отменяет поездку
+//Canceltrip отмена поездки водителем или админом
 func (s *TripService) CancelTrip(ctx context.Context, userID uuid.UUID, tripID uuid.UUID, isAdmin bool) error {
 	trip, err := s.tripRepo.GetByID(ctx, tripID)
 	if err != nil {
@@ -314,14 +314,14 @@ func (s *TripService) CancelTrip(ctx context.Context, userID uuid.UUID, tripID u
 	return nil
 }
 
-// GetTrip возвращает поездку по ID
+//Gettrip получение поездки по id
 func (s *TripService) GetTrip(ctx context.Context, id uuid.UUID) (*model.Trip, error) {
 	return s.tripRepo.GetByID(ctx, id)
 }
 
-// SearchTrips — поиск поездок по офису, дате и точке пассажира
+//searchtrips поиск поездок по офису дате и точке пассажира
 func (s *TripService) SearchTrips(ctx context.Context, officeID uuid.UUID, date time.Time, lat, lng float64, limit, offset int) ([]*model.Trip, int, error) {
-	// Получаем максимальное расстояние из зоны офиса
+	//Получение максимального расстояния из зоны офиса
 	maxDist := 2000.0
 	zone, err := s.officeRepo.GetZoneByOffice(ctx, officeID)
 	if err == nil && zone != nil {
@@ -341,17 +341,17 @@ func (s *TripService) SearchTrips(ctx context.Context, officeID uuid.UUID, date 
 	return trips, total, nil
 }
 
-// ListMyTrips — поездки водителя
+// Listmytrips поездки водителя
 func (s *TripService) ListMyTrips(ctx context.Context, driverID uuid.UUID, limit, offset int) ([]*model.Trip, int, error) {
 	return s.tripRepo.ListByDriver(ctx, driverID, limit, offset)
 }
 
-// ListJoinedTrips — поездки, в которых пользователь пассажир
+// Listjoinedtrips поездки пассажира
 func (s *TripService) ListJoinedTrips(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.Trip, int, error) {
 	return s.tripRepo.ListJoined(ctx, userID, limit, offset)
 }
 
-// GetRoutePreview — превью маршрута без создания поездки
+//getroutepreview превью маршрута
 func (s *TripService) GetRoutePreview(ctx context.Context, originLat, originLng float64, officeID uuid.UUID, stopCoords ...float64) (*RouteResult, error) {
 	office, err := s.officeRepo.GetByID(ctx, officeID)
 	if err != nil {
@@ -364,17 +364,17 @@ func (s *TripService) GetRoutePreview(ctx context.Context, originLat, originLng 
 	return s.routing.GetRoute(ctx, points...)
 }
 
-// GetPassengers возвращает пассажиров поездки
+//getpassengers получение пассажиров поездки
 func (s *TripService) GetPassengers(ctx context.Context, tripID uuid.UUID) ([]*model.TripPassenger, error) {
 	return s.tripRepo.GetPassengers(ctx, tripID)
 }
 
-// GetStopsByTripID возвращает остановки поездки
+// getstopsbytripid получение остановок поездки
 func (s *TripService) GetStopsByTripID(ctx context.Context, tripID uuid.UUID) ([]*model.TripStop, error) {
 	return s.tripRepo.GetStopsByTripID(ctx, tripID)
 }
 
-// ListAllTrips — для admin панели
+// Listalltrips поездки для админки
 func (s *TripService) ListAllTrips(ctx context.Context, limit, offset int) ([]*model.Trip, int, error) {
 	return s.tripRepo.ListAll(ctx, limit, offset)
 }

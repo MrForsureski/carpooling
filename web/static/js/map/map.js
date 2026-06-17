@@ -1,12 +1,12 @@
-// Read config
+// чтение config
 const offices = window.AppConfig.offices;
 
-// Классифицируем офисы по городам
+//Классификация офисов по городам
 offices.forEach(office => {
     office.city = office.lat > 58.0 ? 'spb' : 'moscow';
 });
 
-// Инициализация карты
+//инициализация карты
 const map = L.map('main-map').setView([55.75, 37.62], 10);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -28,7 +28,7 @@ let markers = [];
 let currentCity = 'moscow';
 
 function updateMapMarkers() {
-    // Удаляем старые маркеры
+    // Удаление старых маркеров
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
@@ -37,7 +37,7 @@ function updateMapMarkers() {
         zoneLayer = null;
     }
 
-    // Фильтруем активные офисы для выбранного города
+    // фильтрация активных офисов для выбранного города
     const filteredOffices = offices.filter(o => o.isActive && o.city === currentCity);
 
     filteredOffices.forEach(office => {
@@ -58,14 +58,14 @@ function updateMapMarkers() {
         markers.push(marker);
     });
 
-    // Центрируем карту по отфильтрованным офисам
+    // Центрирование карты по отфильтрованным офисам
     if (filteredOffices.length > 0) {
         const bounds = L.latLngBounds(filteredOffices.map(o => [o.lat, o.lng]));
         if (bounds.isValid()) {
             map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
         }
     } else {
-        // Дефолтные координаты если офисов нет
+        // Дефолтные координаты при отсутствии офисов
         const center = currentCity === 'spb' ? [59.93, 30.33] : [55.75, 37.62];
         map.setView(center, 10);
     }
@@ -74,7 +74,7 @@ function updateMapMarkers() {
 function setCity(city) {
     currentCity = city;
 
-    // Переключаем стили кнопок
+    // переключение стилей кнопок
     const btnMoscow = document.getElementById('btn-city-moscow');
     const btnSpb = document.getElementById('btn-city-spb');
 
@@ -86,7 +86,7 @@ function setCity(city) {
         if (btnMoscow) btnMoscow.className = "city-tab city-tab-inactive";
     }
 
-    // Скрываем/показываем карточки в боковой панели
+    //скрытие и показ карточек в боковой панели
     let visibleCards = 0;
     document.querySelectorAll('.office-card').forEach(card => {
         if (card.getAttribute('data-city') === city) {
@@ -106,7 +106,7 @@ function setCity(city) {
         }
     }
 
-    // Сбросываем выбранный офис и обновляем маркеры
+    //Сброс выбранного офиса и обновление маркеров
     selectedOfficeId = null;
     document.querySelectorAll('.office-card').forEach(c => c.classList.remove('office-card-active'));
     updateMapMarkers();
@@ -115,12 +115,12 @@ function setCity(city) {
 function selectOffice(id, lat, lng, name) {
     selectedOfficeId = id;
 
-    // Подсвечиваем карточку
+    // подсветка карточки
     document.querySelectorAll('.office-card').forEach(c => c.classList.remove('office-card-active'));
     const card = document.querySelector(`[data-office-id="${id}"]`);
     if (card) card.classList.add('office-card-active');
 
-    // Показываем зону если есть
+    //Показ зоны при наличии
     const office = offices.find(o => o.id === id);
     if (zoneLayer) { map.removeLayer(zoneLayer); zoneLayer = null; }
 
@@ -132,7 +132,7 @@ function selectOffice(id, lat, lng, name) {
         } catch(e) {}
     }
 
-    // Загружаем зону с сервера если нет
+    // Загрузка зоны с сервера при отсутствии
     if (!office || !office.zoneGeoJSON) {
         fetch(`/offices/${id}`)
             .then(r => r.json())
@@ -150,7 +150,7 @@ function selectOffice(id, lat, lng, name) {
     map.setView([lat, lng], 12, { animate: true });
 }
 
-// Инициализируем город при загрузке
+// Инициализация города при загрузке
 document.addEventListener('DOMContentLoaded', () => {
     setCity('moscow');
 });

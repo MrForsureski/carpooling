@@ -10,7 +10,6 @@
 <div class="auth-container">
     <div class="auth-wrapper">
 
-        <!-- Заголовок -->
         <div class="auth-header">
             <div class="auth-logo-box auth-logo-login">
                 <svg class="auth-logo-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,14 +27,12 @@
         </div>
         {{end}}
 
-        <!-- Форма -->
         <div class="auth-card">
             <form id="login-form"
                   x-data="loginForm()"
                   @submit.prevent="submit()"
                   class="auth-form-space">
 
-                <!-- Email -->
                 <div>
                     <label for="login-email" class="auth-label">Email</label>
                     <input id="login-email"
@@ -47,7 +44,6 @@
                            class="auth-input">
                 </div>
 
-                <!-- Пароль -->
                 <div>
                     <label for="login-password" class="auth-label">Пароль</label>
                     <div class="auth-password-wrapper">
@@ -66,13 +62,11 @@
                     </div>
                 </div>
 
-                <!-- Ошибка -->
                 <div x-show="error" x-cloak
                      class="auth-alert-error">
                     <span x-text="error"></span>
                 </div>
 
-                <!-- Кнопка -->
                 <button type="submit"
                         :disabled="loading"
                         id="login-btn"

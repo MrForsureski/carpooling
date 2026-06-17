@@ -25,14 +25,14 @@ func NewClient(baseURL string) *Client {
 	}
 }
 
-// GetRoute строит маршрут через несколько точек.
-// points: пары lat,lng — минимум 2 точки (старт и финиш).
+// getroute построение маршрута через несколько точек
+// points координаты lat lng минимум 2 точки старт и финиш
 func (c *Client) GetRoute(ctx context.Context, points ...float64) (*service.RouteResult, error) {
 	if len(points)%2 != 0 || len(points) < 4 {
 		return nil, fmt.Errorf("invalid points: need pairs of lat,lng, got %d values", len(points))
 	}
 
-	// OSRM принимает координаты в формате lng,lat
+	// osrm формат координат lng lat
 	coords := make([]string, 0, len(points)/2)
 	for i := 0; i < len(points); i += 2 {
 		lat, lng := points[i], points[i+1]

@@ -9,7 +9,6 @@
 {{define "content"}}
 <div class="trips-container" x-data="tripsSearch()">
 
-    <!-- Заголовок и выбор города -->
     <div class="trips-header">
         <div>
             <h1 class="page-title">
@@ -17,7 +16,7 @@
             </h1>
             <p class="page-subtitle">Найдите поездки и присоединяйтесь к попутчикам</p>
         </div>
-        <!-- Выбор города -->
+        
         <div class="city-selector">
             <button @click="setCity('moscow')"
                     :class="currentCity === 'moscow' ? 'city-tab city-tab-active' : 'city-tab city-tab-inactive'">
@@ -30,12 +29,10 @@
         </div>
     </div>
 
-    <!-- Сеточная раскладка: десктоп 2 колонки (50% список/фильтры, 50% липкая карта), мобильный — всё в одну колонку -->
     <div class="trips-search-layout">
-        
-        <!-- Левая часть: фильтры -->
+
         <div class="trips-left-col">
-            <!-- Фильтры -->
+            
             <div class="card">
                 <div class="filters-grid">
                     <div>
@@ -67,14 +64,12 @@
             </div>
         </div>
 
-        <!-- Правая часть (карта) -->
         <div class="trips-right-col">
             <div class="map-card-wrapper">
                 <div id="trips-map"></div>
             </div>
         </div>
 
-        <!-- Левая часть: список поездок -->
         <div id="trips-list" class="trips-list-wrapper">
             {{if .Trips}}
             {{range .Trips}}
@@ -141,8 +136,7 @@
                 </div>
             </div>
             {{end}}
-            
-            <!-- Динамический плейсхолдер для пустого списка после фильтрации -->
+
             <div id="no-trips-filtered-placeholder" class="trips-empty-placeholder hidden">
                 <div class="trips-empty-icon">🔍</div>
                 <h3 class="trips-empty-title">Поездки не найдены</h3>
@@ -160,7 +154,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно подтверждения остановки -->
     <div x-show="joinModal" x-cloak
          class="join-modal-overlay"
          @click.self="joinModal = false">

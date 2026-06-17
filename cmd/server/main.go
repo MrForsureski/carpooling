@@ -19,13 +19,13 @@ import (
 )
 
 func main() {
-	// Структурированное логирование через slog
+	// структурированное логирование через slog
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 	slog.SetDefault(logger)
 
-	// Загружаем конфигурацию из .env / переменных окружения
+	//загрузка конфигурации из env переменных окружения
 	cfg := config.Load()
 
 	if cfg.JWTSecret == "" {
@@ -33,7 +33,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Подключение к БД
+	//подключение к базе данных
 	db, err := sqlx.Connect("postgres", cfg.DatabaseURL)
 	if err != nil {
 		slog.Error("failed to connect to database", "error", err)
@@ -46,19 +46,19 @@ func main() {
 
 	slog.Info("connected to database")
 
-	// Репозитории
+	// репозитории
 	userRepo := pgRepo.NewUserRepo(db)
 	tripRepo := pgRepo.NewTripRepo(db)
 	officeRepo := pgRepo.NewOfficeRepo(db)
 
-	// Сервисы
+	// сервисы
 	txManager := pgRepo.NewTransactionManager(db)
 	authSvc := service.NewAuthService(userRepo, cfg)
 	routingSvc := osrm.NewClient(cfg.OSRMBaseURL)
 	officeSvc := service.NewOfficeService(officeRepo)
 	tripSvc := service.NewTripService(tripRepo, officeRepo, userRepo, routingSvc, txManager)
 
-	// Хэндлеры и роутер
+	//хендлеры и роутер
 	h := handler.New(handler.Deps{
 		AuthSvc:   authSvc,
 		TripSvc:   tripSvc,
@@ -66,7 +66,7 @@ func main() {
 		Config:    cfg,
 	})
 
-	// HTTP сервер
+	//Http сервер
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      h.Router(),
@@ -75,7 +75,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// Запускаем сервер в горутине
+	//запуск сервера в горутине
 	go func() {
 		slog.Info("server starting", "port", cfg.Port, "env", cfg.Environment)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -84,7 +84,7 @@ func main() {
 		}
 	}()
 
-	// Graceful shutdown
+	// graceful shutdown завершение работы
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

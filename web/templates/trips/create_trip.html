@@ -15,13 +15,11 @@
 
     <div class="create-trip-layout">
 
-        <!-- Форма -->
         <div class="card"
              x-data="tripCreateForm()">
 
             <form @submit.prevent="submit()" class="create-trip-form-space">
 
-                <!-- Офис назначения -->
                 <div>
                     <label class="create-trip-label">Офис назначения</label>
                     <select name="office_id" x-model="officeId" @change="loadOffice()"
@@ -34,7 +32,6 @@
                     </select>
                 </div>
 
-                <!-- Точка старта (выбирается на карте) -->
                 <div>
                     <label class="create-trip-label">Точка отправления</label>
                     <div class="create-trip-origin-placeholder"
@@ -63,7 +60,6 @@
                     <input type="hidden" name="origin_address" x-model="originAddress">
                 </div>
 
-                <!-- Дата и время -->
                 <div>
                     <label for="depart-at" class="create-trip-label">Дата и время выезда</label>
                     <input id="depart-at" type="datetime-local" name="depart_at" x-model="departAt"
@@ -71,7 +67,6 @@
                            class="input-text">
                 </div>
 
-                <!-- Промежуточные остановки -->
                 <div class="create-trip-stops-section">
                     <label class="create-trip-label">Промежуточные остановки (по порядку)</label>
                     
@@ -108,18 +103,15 @@
                     </p>
                 </div>
 
-                <!-- Количество мест -->
                 <div>
                     <label class="create-trip-label">Мест для пассажиров</label>
                     <input type="number" x-model.number="seats" min="1" max="20"
                            class="input-text">
                 </div>
 
-                <!-- Ошибка / Успех -->
                 <div x-show="error" x-cloak class="create-trip-alert-error" x-text="error"></div>
                 <div x-show="success" x-cloak class="create-trip-alert-success" x-text="success"></div>
 
-                <!-- Кнопка -->
                 <button type="submit"
                         :disabled="!originLat || !officeId || !departAt || loading"
                         class="btn-primary btn-full">
@@ -132,7 +124,6 @@
             </form>
         </div>
 
-        <!-- Карта -->
         <div class="create-trip-map-wrapper">
             <div id="create-map"></div>
         </div>

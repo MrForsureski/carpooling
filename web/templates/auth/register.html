@@ -50,7 +50,7 @@
                     <input id="reg-password" type="password" x-model="password" placeholder="Минимум 8 символов"
                            autocomplete="new-password" required minlength="8"
                            class="auth-input">
-                    <!-- Индикатор силы пароля -->
+                    
                     <div class="auth-strength-meter" x-show="password.length > 0">
                         <div class="auth-strength-bar"
                              :class="password.length >= 8 ? 'strength-bar-active' : 'strength-bar-inactive'"></div>
@@ -61,7 +61,6 @@
                     </div>
                 </div>
 
-                <!-- Ошибка / Успех -->
                 <div x-show="error" x-cloak class="auth-alert-error" x-text="error"></div>
                 <div x-show="success" x-cloak class="auth-alert-success" x-text="success"></div>
 

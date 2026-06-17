@@ -12,7 +12,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// register — POST /auth/register
+// register регистрация пользователя
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	var req dto.RegisterRequest
 	if err := h.decodeJSON(r, &req); err != nil {
@@ -39,7 +39,7 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// В разработке — сразу верифицируем (без отправки email)
+	//разработка верификация без отправки email
 	if h.cfg.Environment == "development" {
 		_ = h.authSvc.QuickVerifyForDev(r.Context(), user.ID)
 	}
@@ -51,7 +51,7 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// login — POST /auth/login
+// login авторизация пользователя
 func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 	var req dto.LoginRequest
 	if err := h.decodeJSON(r, &req); err != nil {
@@ -77,7 +77,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Устанавливаем refresh token в httpOnly cookie
+	//установка refresh token в httponly cookie
 	secure := h.cfg.Environment == "production"
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
@@ -89,7 +89,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   int(h.cfg.JWTRefreshExpiry.Seconds()),
 	})
 
-	// Устанавливаем access token в cookie для прямой навигации в браузере
+	// Установка access token в cookie для прямой навигации в браузере
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    authResp.AccessToken,
@@ -103,7 +103,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, authResp)
 }
 
-// logout — POST /auth/logout
+// Logout выход из системы
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	userIDStr, ok := mw.GetUserID(r)
 	if !ok {
@@ -167,7 +167,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Выход выполнен"})
 }
 
-// refresh — POST /auth/refresh
+//refresh обновление токенов
 func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("refresh_token")
 	if err != nil {
@@ -175,7 +175,7 @@ func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получаем user_id из тела запроса или из cookie (если хранили)
+	//Получение user id из тела запроса или из cookie
 	var body struct {
 		UserID string `json:"user_id"`
 	}
@@ -199,7 +199,7 @@ func (h *Handler) refresh(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// verifyEmail — GET /auth/verify?token=xxx
+// Verifyemail подтверждение email
 func (h *Handler) verifyEmail(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {
@@ -212,11 +212,11 @@ func (h *Handler) verifyEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Редирект на страницу логина
+	//редирект на страницу логина
 	http.Redirect(w, r, "/login?verified=1", http.StatusFound)
 }
 
-// loginPage — GET /login
+//Loginpage получение страницы входа
 func (h *Handler) loginPage(w http.ResponseWriter, r *http.Request) {
 	data := map[string]any{
 		"Title":    "Вход",
@@ -227,7 +227,7 @@ func (h *Handler) loginPage(w http.ResponseWriter, r *http.Request) {
 	h.renderTemplate(w, "login.html", data)
 }
 
-// registerPage — GET /register
+// registerpage получение страницы регистрации
 func (h *Handler) registerPage(w http.ResponseWriter, r *http.Request) {
 	data := map[string]any{
 		"Title":   "Регистрация",
@@ -237,14 +237,14 @@ func (h *Handler) registerPage(w http.ResponseWriter, r *http.Request) {
 	h.renderTemplate(w, "register.html", data)
 }
 
-// profilePage — GET /profile
+//Profilepage получение страницы профиля
 func (h *Handler) profilePage(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
 		return
 	}
 
-	// Число поездок: водитель — созданные, пассажир — записался
+	//статистика поездок водитель создал пассажир записался
 	var tripCount int
 	if user.Role == "driver" || user.Role == "admin" {
 		_, total, err := h.tripSvc.ListMyTrips(r.Context(), user.ID, 1, 0)

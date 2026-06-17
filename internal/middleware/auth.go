@@ -16,7 +16,7 @@ const (
 	ContextUserRole contextKey = "user_role"
 )
 
-// Auth проверяет JWT Bearer токен из заголовка Authorization
+// Auth проверка jwt bearer токена из заголовка authorization
 func Auth(jwtSecret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +59,7 @@ func Auth(jwtSecret string) func(http.Handler) http.Handler {
 			})
 			if err != nil || !token.Valid {
 				if acceptsHTML(r) {
-					// Очищаем куки
+					//Очистка куки
 					http.SetCookie(w, &http.Cookie{
 						Name:     "access_token",
 						Value:    "",
@@ -96,7 +96,7 @@ func acceptsHTML(r *http.Request) bool {
 	return accept == "" || strings.Contains(accept, "text/html")
 }
 
-// RequireRole проверяет, что у пользователя одна из разрешённых ролей
+//Requirerole проверка роли пользователя
 func RequireRole(roles ...model.Role) func(http.Handler) http.Handler {
 	allowed := make(map[string]bool)
 	for _, r := range roles {
@@ -114,13 +114,13 @@ func RequireRole(roles ...model.Role) func(http.Handler) http.Handler {
 	}
 }
 
-// GetUserID извлекает UUID пользователя из контекста
+// Getuserid получение uuid пользователя из контекста
 func GetUserID(r *http.Request) (string, bool) {
 	id, ok := r.Context().Value(ContextUserID).(string)
 	return id, ok && id != ""
 }
 
-// GetUserRole извлекает роль пользователя из контекста
+//getuserrole получение роли пользователя из контекста
 func GetUserRole(r *http.Request) string {
 	role, _ := r.Context().Value(ContextUserRole).(string)
 	return role

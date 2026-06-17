@@ -20,7 +20,7 @@ function loginForm() {
                     this.error = data.message || 'Ошибка входа';
                     return;
                 }
-                // Сохраняем access token
+                // сохранение access token
                 localStorage.setItem('access_token', data.access_token);
                 localStorage.setItem('user_id', data.user.id);
                 localStorage.setItem('user_role', data.user.role);

@@ -26,33 +26,33 @@ func NewAuthService(userRepo repository.UserRepository, cfg *config.Config) *Aut
 	return &AuthService{userRepo: userRepo, cfg: cfg}
 }
 
-// Register создаёт нового пользователя
+//register создание нового пользователя
 func (s *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (*model.User, error) {
-	// Извлекаем домен из email
+	// извлечение домена из email
 	parts := strings.Split(req.Email, "@")
 	if len(parts) != 2 {
 		return nil, model.ErrEmailDomainNotAllowed
 	}
 	domain := parts[1]
 
-	// Проверяем, что домен разрешён
+	// проверка домена на доступность
 	company, err := s.userRepo.GetCompanyByEmailDomain(ctx, domain)
 	if err != nil {
 		return nil, model.ErrEmailDomainNotAllowed
 	}
 
-	// Проверяем, нет ли уже такого пользователя
+	//проверка существования пользователя
 	if _, err := s.userRepo.GetByEmail(ctx, req.Email); err == nil {
 		return nil, model.ErrEmailAlreadyExists
 	}
 
-	// Хэшируем пароль
+	//Хэширование пароля
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), 12)
 	if err != nil {
 		return nil, err
 	}
 
-	// Генерируем verify token
+	// Генерация verify token
 	verifyToken, err := generateToken(32)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (s *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (*m
 	return user, nil
 }
 
-// Login проверяет credentials и возвращает токены
+//Login проверка учетных данных и выдача токенов
 func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.AuthResponse, string, error) {
 	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
@@ -111,7 +111,7 @@ func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Aut
 		return nil, "", err
 	}
 
-	// Хэшируем refresh token для хранения
+	//хэширование refresh token для хранения
 	refreshHash, err := bcrypt.GenerateFromPassword([]byte(refreshToken), 10)
 	if err != nil {
 		return nil, "", err
@@ -134,14 +134,14 @@ func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Aut
 	}, refreshToken, nil
 }
 
-// VerifyEmail подтверждает email по токену
+// verifyemail подтверждение email по токену
 func (s *AuthService) VerifyEmail(ctx context.Context, token string) error {
 	user, err := s.userRepo.GetByVerifyToken(ctx, token)
 	if err != nil {
 		return model.ErrInvalidToken
 	}
 
-	// Проверяем срок годности токена (24 часа)
+	//Проверка срока действия токена
 	if user.VerifyTokenAt != nil && time.Since(*user.VerifyTokenAt) > 24*time.Hour {
 		return model.ErrInvalidToken
 	}
@@ -149,12 +149,12 @@ func (s *AuthService) VerifyEmail(ctx context.Context, token string) error {
 	return s.userRepo.UpdateEmailVerified(ctx, user.ID)
 }
 
-// Logout инвалидирует refresh token
+//logout инвалидация refresh token
 func (s *AuthService) Logout(ctx context.Context, userID uuid.UUID) error {
 	return s.userRepo.UpdateRefreshToken(ctx, userID, nil, nil)
 }
 
-// RefreshAccessToken обновляет access token через refresh token
+// Refreshaccesstoken обновление access token через refresh token
 func (s *AuthService) RefreshAccessToken(ctx context.Context, userID uuid.UUID, refreshToken string) (string, error) {
 	user, err := s.userRepo.GetByID(ctx, userID)
 	if err != nil {
@@ -169,7 +169,7 @@ func (s *AuthService) RefreshAccessToken(ctx context.Context, userID uuid.UUID, 
 		return "", model.ErrInvalidToken
 	}
 
-	// Проверяем срок refresh token
+	// проверка срока refresh token
 	if user.RefreshTokenAt != nil && time.Since(*user.RefreshTokenAt) > s.cfg.JWTRefreshExpiry {
 		return "", model.ErrInvalidToken
 	}
@@ -177,7 +177,7 @@ func (s *AuthService) RefreshAccessToken(ctx context.Context, userID uuid.UUID, 
 	return s.generateAccessToken(user)
 }
 
-// ValidateAccessToken проверяет JWT и возвращает claims
+//validateaccesstoken проверка jwt и получение claims
 func (s *AuthService) ValidateAccessToken(tokenStr string) (uuid.UUID, model.Role, error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -215,7 +215,7 @@ func (s *AuthService) generateAccessToken(user *model.User) (string, error) {
 	return token.SignedString([]byte(s.cfg.JWTSecret))
 }
 
-// generateToken генерирует случайный hex-токен заданной длины
+// generatetoken генерация случайного hex токена
 func generateToken(length int) (string, error) {
 	b := make([]byte, length)
 	if _, err := rand.Read(b); err != nil {
@@ -224,12 +224,12 @@ func generateToken(length int) (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-// QuickVerifyForDev немедленно верифицирует пользователя (для разработки)
+//quickverifyfordev немедленная верификация пользователя для разработки
 func (s *AuthService) QuickVerifyForDev(ctx context.Context, userID uuid.UUID) error {
 	return s.userRepo.UpdateEmailVerified(ctx, userID)
 }
 
-// GetUserByID возвращает пользователя по ID
+//getuserbyid получение пользователя по id
 func (s *AuthService) GetUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error) {
 	return s.userRepo.GetByID(ctx, userID)
 }
@@ -242,7 +242,7 @@ func (s *AuthService) UpdateRole(ctx context.Context, userID uuid.UUID, role mod
 	return s.userRepo.UpdateRole(ctx, userID, role)
 }
 
-// GetVerifyToken возвращает verify token пользователя (для отправки email)
+//getverifytoken получение verify token пользователя
 func (s *AuthService) GetVerifyToken(user *model.User) string {
 	if user.VerifyToken != nil {
 		return *user.VerifyToken
@@ -250,7 +250,7 @@ func (s *AuthService) GetVerifyToken(user *model.User) string {
 	return ""
 }
 
-// GetErrors возвращает часто используемые ошибки
+// Geterrors получение списка ошибок
 func (s *AuthService) IsEmailDomainError(err error) bool {
 	return errors.Is(err, model.ErrEmailDomainNotAllowed)
 }

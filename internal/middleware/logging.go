@@ -9,13 +9,13 @@ import (
 	"time"
 )
 
-// responseWriter обёртка для захвата статус кода
+// responsewriter обертка для захвата статус кода
 type responseWriter struct {
 	http.ResponseWriter
 	status int
 }
 
-// Hijack реализует http.Hijacker для поддержки WebSockets
+// Hijack реализация http hijacker для поддержки websockets
 func (rw *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	if hj, ok := rw.ResponseWriter.(http.Hijacker); ok {
 		return hj.Hijack()
@@ -28,7 +28,7 @@ func (rw *responseWriter) WriteHeader(status int) {
 	rw.ResponseWriter.WriteHeader(status)
 }
 
-// Logging логирует каждый HTTP запрос
+// logging логирование каждого http запроса
 func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

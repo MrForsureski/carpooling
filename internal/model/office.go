@@ -11,7 +11,7 @@ type Office struct {
 	CompanyID uuid.UUID `db:"company_id" json:"company_id"`
 	Name      string    `db:"name"       json:"name"`
 	Address   string    `db:"address"    json:"address"`
-	// WKT геометрия из БД
+	//wkt геометрия из бд
 	LocationWKT string  `db:"location"   json:"-"`
 	Lat         float64 `db:"-"          json:"lat"`
 	Lng         float64 `db:"-"          json:"lng"`
@@ -19,7 +19,7 @@ type Office struct {
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 
-	// Joined поля
+	//Joined поля
 	ZoneGeoJSON string `db:"-" json:"zone_geojson,omitempty"`
 }
 

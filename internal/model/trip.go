@@ -34,18 +34,18 @@ type Trip struct {
 	CreatedAt       time.Time  `db:"created_at"       json:"created_at"`
 	UpdatedAt       time.Time  `db:"updated_at"       json:"updated_at"`
 
-	// Joined поля
+	//joined поля
 	DriverName      string     `db:"driver_name"       json:"driver_name,omitempty"`
 	OfficeName      string     `db:"office_name"       json:"office_name,omitempty"`
 	DistanceToRoute float64    `db:"distance_to_route" json:"distance_to_route,omitempty"`
 
-	// Runtime (для бизнес-логики, не из БД)
+	//Runtime для бизнес логики
 	Zone *OfficeZone `db:"-" json:"-"`
 	Stops []*TripStop `db:"-" json:"stops,omitempty"`
 	UserPickupStop *TripStop `db:"-" json:"user_pickup_stop,omitempty"`
 }
 
-// CanJoin проверяет инварианты возможности присоединения пассажира к поездке.
+//canjoin проверка возможности присоединения пассажира
 func (t *Trip) CanJoin(passengerID uuid.UUID) error {
 	if t.Status != TripStatusScheduled {
 		return ErrTripNotScheduled
@@ -89,7 +89,7 @@ type TripPassenger struct {
 	JoinedAt      time.Time  `db:"joined_at"      json:"joined_at"`
 	CancelledAt   *time.Time `db:"cancelled_at"   json:"cancelled_at,omitempty"`
 
-	// Joined
+	// Joinedtrips получение поездок в которых пользователь пассажир
 	UserFullName string `db:"user_full_name" json:"user_full_name,omitempty"`
 	StopID       *uuid.UUID `db:"stop_id" json:"stop_id,omitempty"`
 }

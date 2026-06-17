@@ -6,25 +6,19 @@
     <title>{{block "title" .}}{{.AppName}}{{end}}</title>
     <meta name="description" content="Платформа совместных поездок в офис для сотрудников">
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/tailwind.config.js"></script>
 
-    <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
-    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
 
-    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Global Styles -->
     <link rel="stylesheet" href="/static/css/base.css?v=1.0.2">
 
     {{block "head" .}}{{end}}
@@ -34,7 +28,6 @@
 
     {{template "nav.html" .}}
 
-    <!-- Toast уведомление -->
     <div x-show="notification"
          x-cloak
          x-transition:enter="transition ease-out duration-300"

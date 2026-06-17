@@ -1,4 +1,4 @@
-/* Styles for Authentication (Login and Register) */
+
 
 .auth-container {
     min-height: 80vh;
@@ -10,7 +10,7 @@
 
 .auth-wrapper {
     width: 100%;
-    max-width: 28rem; /* max-w-md */
+    max-width: 28rem; 
 }
 
 .auth-logo-box {

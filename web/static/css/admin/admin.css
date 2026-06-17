@@ -1,4 +1,4 @@
-/* Admin Dashboard & Control Panel Styles */
+
 
 .admin-stats-grid {
     display: grid;
@@ -61,7 +61,6 @@
     height: 100%;
 }
 
-/* Admin Users Table Styles */
 .admin-table-card {
     background-color: #ffffff;
     border-radius: 1rem;
@@ -100,7 +99,6 @@
     border-color: #6366f1;
 }
 
-/* Admin Modal and Offices Styles */
 .admin-modal-overlay {
     position: fixed;
     inset: 0;
@@ -117,7 +115,7 @@
     border-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 100%;
-    max-width: 32rem; /* max-w-lg */
+    max-width: 32rem; 
     margin-left: 1rem;
     margin-right: 1rem;
     padding: 1.5rem;
@@ -128,7 +126,7 @@
     border-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 100%;
-    max-width: 36rem; /* max-w-xl */
+    max-width: 36rem; 
     margin-left: 1rem;
     margin-right: 1rem;
     padding: 1.5rem;
@@ -286,7 +284,6 @@
     margin-top: 0;
 }
 
-/* Admin Tables, Badges and User Lists */
 .admin-header-row {
     display: flex;
     align-items: center;
@@ -374,7 +371,6 @@
 .badge-gray { background-color: #f1f5f9; color: #475569; }
 .badge-amber { background-color: #fef3c7; color: #b45309; }
 
-/* Admin Offices and Forms Helpers */
 .admin-office-name {
     font-weight: 600;
     color: #1e293b;

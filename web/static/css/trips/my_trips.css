@@ -9,7 +9,6 @@
     background: transparent;
 }
 
-/* My Trips Styles */
 .my-trip-card {
     background-color: #ffffff;
     border-radius: 1rem;
@@ -125,7 +124,6 @@
     background-color: #fee2e2;
 }
 
-/* Layout & Empty states */
 .my-trips-container {
     max-width: 56rem;
     margin-left: auto;

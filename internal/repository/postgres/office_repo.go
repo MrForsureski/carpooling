@@ -18,7 +18,7 @@ func NewOfficeRepo(db *sqlx.DB) *OfficeRepo {
 	return &OfficeRepo{db: db}
 }
 
-// row для выборки из БД (с ST_AsGeoJSON для геометрии)
+//row для выборки из бд с st asgeojson для геометрии
 type officeRow struct {
 	ID          uuid.UUID `db:"id"`
 	CompanyID   uuid.UUID `db:"company_id"`
@@ -71,7 +71,7 @@ func (r *OfficeRepo) GetByID(ctx context.Context, id uuid.UUID) (*model.Office, 
 		IsActive:  row.IsActive,
 	}
 
-	// Получаем зону если есть
+	//получение зоны при наличии
 	zone, err := r.GetZoneByOffice(ctx, id)
 	if err == nil && zone != nil {
 		o.ZoneGeoJSON = zone.PickupZoneGeoJSON

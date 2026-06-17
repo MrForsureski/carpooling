@@ -12,7 +12,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// adminListUsers — GET /admin/users
+// adminlistusers получение списка пользователей
 func (h *Handler) adminListUsers(w http.ResponseWriter, r *http.Request) {
 	currentUser, ok := h.getAuthUser(w, r)
 	if !ok {
@@ -42,7 +42,7 @@ func (h *Handler) adminListUsers(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]any{"users": users, "total": total})
 }
 
-// adminUpdateRole — PUT /admin/users/:id/role
+//adminupdaterole изменение роли пользователя
 func (h *Handler) adminUpdateRole(w http.ResponseWriter, r *http.Request) {
 	userID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -68,7 +68,7 @@ func (h *Handler) adminUpdateRole(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Роль обновлена"})
 }
 
-// adminListTrips — GET /admin/trips
+// adminlisttrips получение списка поездок
 func (h *Handler) adminListTrips(w http.ResponseWriter, r *http.Request) {
 	limit, offset := pagination(r)
 	trips, total, err := h.tripSvc.ListAllTrips(r.Context(), limit, offset)
@@ -80,7 +80,7 @@ func (h *Handler) adminListTrips(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]any{"trips": trips, "total": total})
 }
 
-// adminCancelTrip — POST /admin/trips/:id/cancel
+// Admincanceltrip отмена поездки админом
 func (h *Handler) adminCancelTrip(w http.ResponseWriter, r *http.Request) {
 	tripID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -104,7 +104,7 @@ func (h *Handler) adminCancelTrip(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Поездка отменена"})
 }
 
-// adminStats — GET /admin/stats
+// Adminstats получение админ статистики
 func (h *Handler) adminStats(w http.ResponseWriter, r *http.Request) {
 	_, totalUsers, _ := h.authSvc.ListUsers(r.Context(), 1, 0)
 	_, totalTrips, _ := h.tripSvc.ListAllTrips(r.Context(), 1, 0)
@@ -115,7 +115,7 @@ func (h *Handler) adminStats(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// adminPage — GET /admin
+// Adminpage получение админ страницы
 func (h *Handler) adminPage(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {

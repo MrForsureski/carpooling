@@ -20,7 +20,7 @@ import (
 	"office_trip/internal/service"
 )
 
-// Handler — основная структура с зависимостями
+// Handler основная структура с зависимостями
 type Handler struct {
 	authSvc   *service.AuthService
 	tripSvc   *service.TripService
@@ -30,7 +30,7 @@ type Handler struct {
 	templates map[string]*template.Template
 }
 
-// Deps — зависимости для создания Handler
+// Deps зависимости для создания handler
 type Deps struct {
 	AuthSvc   *service.AuthService
 	TripSvc   *service.TripService
@@ -47,14 +47,14 @@ func New(deps Deps) *Handler {
 		validate:  validator.New(),
 	}
 
-	// Загружаем шаблоны
+	//загрузка шаблонов
 	h.loadTemplates()
 
 	return h
 }
 
 func (h *Handler) loadTemplates() {
-	// Template функции
+	//template функции
 	moscow, _ := time.LoadLocation("Europe/Moscow")
 	if moscow == nil {
 		moscow = time.FixedZone("MSK", 3*60*60)
@@ -152,21 +152,21 @@ func (h *Handler) loadTemplates() {
 	}
 }
 
-// Router создаёт и возвращает Chi роутер со всеми маршрутами
+// router создание и возврат chi роутера со всеми маршрутами
 func (h *Handler) Router() http.Handler {
 	r := chi.NewRouter()
 
-	// Глобальный middleware
+	//глобальный middleware
 	r.Use(middleware.Recoverer)
 	r.Use(mw.Logging)
 
 	// Статические файлы
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 
-	// Health check (без авторизации)
+	// Health check без авторизации
 	r.Get("/health", h.healthCheck)
 
-	// Auth маршруты (без JWT)
+	// auth маршруты без jwt
 	r.Group(func(r chi.Router) {
 		r.Post("/auth/register", h.register)
 		r.Post("/auth/login", h.login)
@@ -179,11 +179,11 @@ func (h *Handler) Router() http.Handler {
 		r.Get("/register", h.registerPage)
 	})
 
-	// Защищённые маршруты (требуют JWT)
+	// Защищенные маршруты требуют jwt
 	r.Group(func(r chi.Router) {
 		r.Use(mw.Auth(h.cfg.JWTSecret))
 
-		// Офисы
+		//Классификация офисов по городам
 		r.Get("/offices", h.listOffices)
 		r.Get("/offices/{id}", h.getOffice)
 
@@ -193,14 +193,14 @@ func (h *Handler) Router() http.Handler {
 		r.Get("/trips/joined", h.joinedTrips)
 		r.Get("/trips/{id}", h.getTrip)
 
-		// Route preview (для карты)
+		// route preview для карты
 		r.Get("/api/route-preview", h.routePreview)
 
-		// Страницы
+		//страницы авторизации
 		r.Get("/map", h.mapPage)
 		r.Get("/profile", h.profilePage)
 
-		// Присоединение/выход из поездки
+		//присоединение и выход из поездки
 		r.Post("/trips/{id}/join", h.joinTrip)
 		r.Post("/trips/{id}/leave", h.leaveTrip)
 
@@ -236,7 +236,7 @@ func (h *Handler) Router() http.Handler {
 	return r
 }
 
-// healthCheck — /health endpoint
+//Healthcheck health endpoint
 func (h *Handler) healthCheck(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{
 		"status":  "ok",
@@ -244,7 +244,7 @@ func (h *Handler) healthCheck(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// --- Вспомогательные методы ---
+//вспомогательные методы
 
 func (h *Handler) respondJSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -283,15 +283,15 @@ func (h *Handler) decodeJSON(r *http.Request, dst any) error {
 	return json.NewDecoder(r.Body).Decode(dst)
 }
 
-// pagination парсит limit/offset из query параметров
+// Pagination парсинг limit offset из query параметров
 func pagination(r *http.Request) (limit, offset int) {
 	limit = 20
 	offset = 0
-	// Простая реализация — можно расширить
+	// Простая реализация возможность расширения
 	return limit, offset
 }
 
-// getAuthUser возвращает авторизованного пользователя или редиректит/очищает сессию при ошибке
+//Getauthuser возврат авторизованного пользователя или редирект и очистка сессии при ошибке
 func (h *Handler) getAuthUser(w http.ResponseWriter, r *http.Request) (*model.User, bool) {
 	userIDStr, ok := mw.GetUserID(r)
 	if !ok {

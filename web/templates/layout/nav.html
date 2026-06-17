@@ -3,7 +3,6 @@
     <div class="navbar-container">
         <div class="navbar-wrapper">
 
-            <!-- Лого -->
             <a href="/map" class="logo-link group">
                 <div class="logo-container">
                     <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,7 +12,6 @@
                 <span class="logo-text">{{.AppName}}</span>
             </a>
 
-            <!-- Десктоп меню -->
             <div class="nav-links">
                 <a href="/map" class="nav-link">
                     🗺️ Карта
@@ -35,7 +33,7 @@
                         ⚙️ Админ
                     </a>
                     {{end}}
-                    <!-- Профиль -->
+                    
                     <div class="nav-user-dropdown" x-data="{ open: false }">
                         <button @click="open = !open" class="nav-user-btn">
                             <div class="nav-user-avatar">
@@ -71,7 +69,6 @@
                 {{end}}
             </div>
 
-            <!-- Мобильный бургер -->
             <button @click="mobileOpen = !mobileOpen" class="nav-burger">
                 <svg class="nav-burger-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path x-show="!mobileOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -81,7 +78,6 @@
         </div>
     </div>
 
-    <!-- Мобильное меню -->
     <div x-show="mobileOpen" x-cloak x-transition class="mobile-menu">
         <a href="/map" class="mobile-menu-link">🗺️ Карта</a>
         <a href="/trips" class="mobile-menu-link">🚗 Поездки</a>

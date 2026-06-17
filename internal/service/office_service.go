@@ -63,13 +63,13 @@ func (s *OfficeService) DeactivateOffice(ctx context.Context, id uuid.UUID) erro
 }
 
 func (s *OfficeService) CreateZone(ctx context.Context, officeID uuid.UUID, req dto.CreateZoneRequest) (*model.OfficeZone, error) {
-	// Сериализуем GeoJSON полигон
+	// сериализация geojson полигона
 	geoJSONStr, err := marshalGeoJSON(req.PickupZone)
 	if err != nil {
 		return nil, err
 	}
 
-	// Дефолты если не указаны
+	//дефолтные значения при отсутствии
 	if req.MaxDetourMinutes == 0 {
 		req.MaxDetourMinutes = 15
 	}
@@ -112,7 +112,7 @@ func (s *OfficeService) GetZone(ctx context.Context, officeID uuid.UUID) (*model
 	return s.officeRepo.GetZoneByOffice(ctx, officeID)
 }
 
-// marshalGeoJSON конвертирует map в JSON строку
+// Marshalgeojson конвертация map в json
 func marshalGeoJSON(m map[string]interface{}) (string, error) {
 	b, err := json.Marshal(m)
 	if err != nil {

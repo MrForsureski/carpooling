@@ -1,7 +1,7 @@
-// Read config
+//чтение config
 const offices = window.AppConfig.offices;
 
-// Инициализация карты
+//Инициализация карты
 const map = L.map('create-map').setView([55.75, 37.62], 11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
@@ -32,7 +32,7 @@ function drawStopMarkers(stops) {
     });
 }
 
-// Кастомные иконки
+//кастомные иконки
 const greenDot = L.divIcon({
     className: '',
     html: `<div style="width:16px;height:16px;background:#10b981;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(16,185,129,0.6)"></div>`,
@@ -46,25 +46,25 @@ const redPin = L.divIcon({
     iconAnchor: [8, 8]
 });
 
-// Клик по карте — выбираем точку старта или остановку
+// клик по карте и выбор точки старта или остановки
 map.on('click', async (e) => {
     const { lat, lng } = e.latlng;
 
-    // Обновляем Alpine данные
+    // Обновление alpine данных
     const alpineEl = Alpine.$data(document.querySelector('[x-data="tripCreateForm()"]'));
 
     if (alpineEl.mapMode === 'origin') {
         alpineEl.originLat = lat.toFixed(6);
         alpineEl.originLng = lng.toFixed(6);
 
-        // Маркер
+        //Иконки маркеров
         if (originMarker) map.removeLayer(originMarker);
         originMarker = L.marker([lat, lng], { icon: greenDot })
             .addTo(map)
             .bindPopup('Точка отправления')
             .openPopup();
 
-        // Реверс-геокодинг
+        // Реверс геокодинг
         try {
             const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
                 headers: { 'User-Agent': 'OfficeTripApp/1.0' }
@@ -79,7 +79,7 @@ map.on('click', async (e) => {
         const newStop = { lat: parseFloat(lat.toFixed(6)), lng: parseFloat(lng.toFixed(6)), address: stopAddress };
         alpineEl.stops.push(newStop);
 
-        // Реверс-геокодинг асинхронно
+        //реверс геокодинг
         try {
             const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
                 headers: { 'User-Agent': 'OfficeTripApp/1.0' }
@@ -89,7 +89,7 @@ map.on('click', async (e) => {
         } catch(e) {}
     }
 
-    // Если офис выбран — строим маршрут
+    // Построение маршрута при выборе офиса
     if (alpineEl.officeId && alpineEl.originLat) {
         buildRoutePreview(alpineEl.originLat, alpineEl.originLng, alpineEl.officeId, alpineEl.stops);
     }
@@ -144,14 +144,14 @@ function tripCreateForm() {
             const office = offices.find(o => o.id === this.officeId);
             if (!office) return;
 
-            // Показываем маркер офиса
+            //маркер
             if (officeMarker) map.removeLayer(officeMarker);
             officeMarker = L.marker([office.lat, office.lng], { icon: redPin })
                 .addTo(map)
                 .bindPopup(office.name)
                 .openPopup();
 
-            // Загружаем зону
+            //Загрузка зоны с сервера при отсутствии
             if (zoneLayer) { map.removeLayer(zoneLayer); zoneLayer = null; }
             try {
                 const resp = await fetch(`/offices/${this.officeId}`, {
@@ -170,7 +170,7 @@ function tripCreateForm() {
                 map.setView([office.lat, office.lng], 12, { animate: true });
             }
 
-            // Перестраиваем маршрут если точка старта уже выбрана
+            // перестроение маршрута при выбранной точке старта
             if (this.originLat && this.originLng) {
                 buildRoutePreview(this.originLat, this.originLng, this.officeId, this.stops);
             }
@@ -195,7 +195,7 @@ function tripCreateForm() {
             this.error = '';
             this.success = '';
             try {
-                // Форматируем дату в RFC3339
+                //Форматирование даты в rfc3339
                 const departAt = new Date(this.departAt).toISOString();
 
                 const resp = await fetch('/trips', {

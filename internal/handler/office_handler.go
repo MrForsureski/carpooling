@@ -13,7 +13,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// listOffices — GET /offices
+// Listoffices получение списка офисов
 func (h *Handler) listOffices(w http.ResponseWriter, r *http.Request) {
 	userIDStr, _ := mw.GetUserID(r)
 	userID, _ := uuid.Parse(userIDStr)
@@ -33,7 +33,7 @@ func (h *Handler) listOffices(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]any{"offices": offices})
 }
 
-// getOffice — GET /offices/:id
+// Getoffice получение офиса по id
 func (h *Handler) getOffice(w http.ResponseWriter, r *http.Request) {
 	officeID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -50,7 +50,7 @@ func (h *Handler) getOffice(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, office)
 }
 
-// createOffice — POST /admin/offices
+//Createoffice создание офиса
 func (h *Handler) createOffice(w http.ResponseWriter, r *http.Request) {
 	userIDStr, _ := mw.GetUserID(r)
 	userID, _ := uuid.Parse(userIDStr)
@@ -80,7 +80,7 @@ func (h *Handler) createOffice(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusCreated, office)
 }
 
-// updateOffice — PUT /admin/offices/:id
+// Updateoffice обновление офиса
 func (h *Handler) updateOffice(w http.ResponseWriter, r *http.Request) {
 	officeID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -103,7 +103,7 @@ func (h *Handler) updateOffice(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, office)
 }
 
-// deactivateOffice — DELETE /admin/offices/:id
+//Deactivateoffice удаление офиса
 func (h *Handler) deactivateOffice(w http.ResponseWriter, r *http.Request) {
 	officeID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -119,7 +119,7 @@ func (h *Handler) deactivateOffice(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Офис деактивирован"})
 }
 
-// createZone — POST /admin/offices/:id/zones
+//createzone создание зоны офиса
 func (h *Handler) createZone(w http.ResponseWriter, r *http.Request) {
 	officeID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -142,7 +142,7 @@ func (h *Handler) createZone(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusCreated, zone)
 }
 
-// updateZone — PUT /admin/offices/:id/zones/:zid
+// updatezone обновление зоны офиса
 func (h *Handler) updateZone(w http.ResponseWriter, r *http.Request) {
 	officeID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -169,7 +169,7 @@ func (h *Handler) updateZone(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Зона обновлена"})
 }
 
-// adminOfficesPage — GET /admin/offices
+// adminofficespage получение страницы админ офисов
 func (h *Handler) adminOfficesPage(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
@@ -188,7 +188,7 @@ func (h *Handler) adminOfficesPage(w http.ResponseWriter, r *http.Request) {
 	h.renderTemplate(w, "admin_offices.html", data)
 }
 
-// getZone — GET /admin/offices/:id/zone
+//Getzone получение зоны офиса
 func (h *Handler) getZone(w http.ResponseWriter, r *http.Request) {
 	officeID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {

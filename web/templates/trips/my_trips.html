@@ -23,7 +23,6 @@
         {{end}}
     </div>
 
-    {{/* ===== ПАССАЖИР: только поездки, к которым присоединился ===== */}}
     {{if eq .User.Role "passenger"}}
     {{if .JoinedTrips}}
     <div class="my-trips-list">
@@ -112,7 +111,6 @@
     {{end}}
     {{end}}
 
-    {{/* ===== ВОДИТЕЛЬ / ADMIN: поездки, которые создал ===== */}}
     {{if or (eq .User.Role "driver") (eq .User.Role "admin")}}
 
     {{if .Trips}}

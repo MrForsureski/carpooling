@@ -3,7 +3,6 @@
     min-height: 450px;
 }
 
-/* Map Mode Selector Buttons */
 .btn-map-mode {
     flex: 1;
     padding: 0.5rem;
@@ -30,7 +29,6 @@
     border-color: #e2e8f0;
 }
 
-/* Stop Edit rows */
 .stop-edit-row {
     display: flex;
     align-items: center;
@@ -90,7 +88,6 @@
     color: #b91c1c;
 }
 
-/* Layout and components styling */
 .create-trip-container {
     max-width: 64rem;
     margin-left: auto;

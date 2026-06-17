@@ -5,7 +5,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// RegisterRequest — запрос на регистрацию
+//registerrequest запрос на регистрацию
 type RegisterRequest struct {
 	Email    string `json:"email"     validate:"required,email"`
 	Password string `json:"password"  validate:"required,min=8"`
@@ -13,20 +13,20 @@ type RegisterRequest struct {
 	Phone    string `json:"phone"     validate:"omitempty,max=20"`
 }
 
-// LoginRequest — запрос на логин
+// loginrequest запрос на логин
 type LoginRequest struct {
 	Email    string `json:"email"    validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
 
-// AuthResponse — ответ при успешном логине
+// Authresponse ответ при успешном логине
 type AuthResponse struct {
 	AccessToken string   `json:"access_token"`
 	ExpiresIn   int      `json:"expires_in"`
 	User        UserInfo `json:"user"`
 }
 
-// UserInfo — публичная информация о пользователе
+//userinfo публичная информация о пользователе
 type UserInfo struct {
 	ID       uuid.UUID  `json:"id"`
 	Email    string     `json:"email"`
@@ -34,7 +34,7 @@ type UserInfo struct {
 	Role     model.Role `json:"role"`
 }
 
-// UpdateRoleRequest — запрос на изменение роли (admin)
+// Updaterolerequest запрос на изменение роли admin
 type UpdateRoleRequest struct {
 	Role model.Role `json:"role" validate:"required,oneof=unverified passenger driver admin"`
 }

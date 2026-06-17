@@ -9,13 +9,12 @@
 {{define "content"}}
 <div class="map-container">
 
-    <!-- Заголовок и выбор города -->
     <div class="trips-header">
         <div>
             <h1 class="page-title">🗺️ Карта поездок</h1>
             <p class="page-subtitle">Офисы и зоны подбора компании</p>
         </div>
-        <!-- Выбор города -->
+        
         <div class="city-selector">
             <button onclick="setCity('moscow')" id="btn-city-moscow"
                     class="city-tab city-tab-active">
@@ -30,7 +29,6 @@
 
     <div class="map-layout">
 
-        <!-- Боковая панель -->
         <div class="map-side-col">
             <div class="card map-side-header-card">
                 <h1 class="map-side-title">🏢 Офисы компании</h1>
@@ -87,7 +85,6 @@
             {{end}}
         </div>
 
-        <!-- Карта -->
         <div class="map-main-col">
             <div class="map-wrapper">
                 <div id="main-map"></div>

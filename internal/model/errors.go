@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Sentinel ошибки
+//sentinel ошибки
 var (
 	ErrTripNotFound          = errors.New("trip not found")
 	ErrTripNotScheduled      = errors.New("trip is not in scheduled status")
@@ -32,7 +32,7 @@ var (
 	ErrTripAlreadyPassed     = errors.New("cannot cancel a trip that has already started or passed")
 )
 
-// ErrTooFarFromRoute — пассажир слишком далеко от маршрута
+//Errtoofarfromroute пассажир слишком далеко от маршрута
 type ErrTooFarFromRoute struct {
 	ActualMeters int
 	MaxMeters    int
@@ -45,7 +45,7 @@ func (e *ErrTooFarFromRoute) Error() string {
 	)
 }
 
-// ErrDetourExceeded — крюк для водителя превышает лимит
+//errdetourexceeded крюк для водителя превышает лимит
 type ErrDetourExceeded struct {
 	ActualMinutes int
 	MaxMinutes    int

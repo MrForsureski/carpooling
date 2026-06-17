@@ -1,7 +1,7 @@
 const tripStopsMap = window.AppConfig.tripStopsMap;
 const offices = window.AppConfig.offices;
 
-// ========== КАРТА ==========
+//карта
 const map = L.map('trips-map').setView([55.75, 37.62], 11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
@@ -13,7 +13,7 @@ let stopMarkers = [];
 let allRouteLayers = [];
 let activeTripId = null;
 
-// Рисуем все маршруты бледным цветом
+// Отрисовка всех маршрутов бледным цветом
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.trip-card').forEach(card => {
         try {
@@ -31,7 +31,7 @@ function clearStopMarkers() {
     stopMarkers = [];
 }
 
-// Создаём круглый маркер-иконку
+//маркер
 function makeCircleIcon(bg, content, shadow) {
     return L.divIcon({
         className: '',
@@ -61,7 +61,7 @@ function highlightTrip(card) {
         if (layer) layer.setStyle({ color: '#94a3b8', weight: 3, opacity: 0.4 });
     });
 
-    // Подсветка активного маршрута
+    //Подсветка активного маршрута
     const idx = Array.from(document.querySelectorAll('.trip-card')).indexOf(card);
     const active = allRouteLayers[idx];
     if (active && active.layer) {
@@ -69,10 +69,10 @@ function highlightTrip(card) {
         active.layer.bringToFront();
     }
 
-    // Удаляем старые маркеры
+    //удаление старых маркеров
     clearStopMarkers();
 
-    // 🟢 Маркер СТАРТА (зелёный, нельзя выбрать как остановку)
+    // маркер
     const originLat = parseFloat(card.dataset.originLat);
     const originLng = parseFloat(card.dataset.originLng);
     if (!isNaN(originLat) && !isNaN(originLng)) {
@@ -86,7 +86,7 @@ function highlightTrip(card) {
         stopMarkers.push(m);
     }
 
-    // 🟣 Маркеры ПРОМЕЖУТОЧНЫХ ОСТАНОВОК (фиолетовые, с цифрой, можно выбрать)
+    //Маркер
     const stops = tripStopsMap[tripId] || [];
     stops.forEach(stop => {
         const m = L.marker([stop.lat, stop.lng], {
@@ -103,7 +103,7 @@ function highlightTrip(card) {
         stopMarkers.push(m);
     });
 
-    // 🔴 Маркер ФИНИША/ОФИСА (красный, нельзя выбрать)
+    // маркер
     try {
         const geom = JSON.parse(card.dataset.route);
         if (geom && geom.coordinates && geom.coordinates.length > 0) {
@@ -119,7 +119,7 @@ function highlightTrip(card) {
         }
     } catch(e) {}
 
-    // Центрируем на маршруте
+    // центрирование на маршруте
     if (active && active.layer) {
         const b = active.layer.getBounds();
         if (b.isValid()) map.fitBounds(b, { padding: [60, 60], maxZoom: 14 });
@@ -135,7 +135,7 @@ function selectStopFromMap(tripId, stopId, address, arrivalTime, seqNum) {
     alpineEl.joinModal = true;
 }
 
-// ========== ALPINE ==========
+//alpine
 function tripsSearch() {
     return {
         currentCity: 'moscow',
@@ -150,7 +150,7 @@ function tripsSearch() {
         selectedStop: null,
 
         init() {
-            // Определяем начальный город
+            // Определение начального города
             const urlParams = new URLSearchParams(window.location.search);
             const cityParam = urlParams.get('city');
             if (cityParam === 'moscow' || cityParam === 'spb') {
@@ -162,7 +162,7 @@ function tripsSearch() {
                 }
             }
             
-            // Фильтруем при инициализации
+            //Фильтрация при инициализации
             this.$nextTick(() => {
                 this.updateFilters();
             });
@@ -172,7 +172,7 @@ function tripsSearch() {
             if (this.currentCity === city) return;
             this.currentCity = city;
             
-            // Если выбранный офис не принадлежит выбранному городу, сбрасываем его
+            //сброс офиса если он не принадлежит выбранному городу
             if (this.filters.officeId) {
                 const office = offices.find(o => o.id === this.filters.officeId);
                 if (!office || office.city !== city) {
@@ -204,13 +204,13 @@ function tripsSearch() {
                 }
             });
             
-            // Обновляем текст с количеством поездок
+            //обновление текста с количеством поездок
             const countEl = document.getElementById('trips-count-text');
             if (countEl) {
                 countEl.textContent = `Показано ${visibleCount} поездок`;
             }
             
-            // Показываем плейсхолдер, если ничего не найдено
+            //Показ плейсхолдера если ничего не найдено
             const placeholderEl = document.getElementById('no-trips-filtered-placeholder');
             if (placeholderEl) {
                 if (visibleCount === 0) {
@@ -220,7 +220,7 @@ function tripsSearch() {
                 }
             }
             
-            // Фильтруем маршруты на карте
+            //фильтрация маршрутов на карте
             let activeLayers = [];
             allRouteLayers.forEach(item => {
                 if (!item.layer) return;
@@ -236,11 +236,11 @@ function tripsSearch() {
                 }
             });
             
-            // Очищаем активные остановки при смене фильтра
+            // очистка активных остановок при смене фильтра
             clearStopMarkers();
             activeTripId = null;
             
-            // Центрируем карту
+            // центрирование карты по отфильтрованным офисам
             if (activeLayers.length > 0) {
                 const group = new L.featureGroup(activeLayers);
                 if (group.getBounds().isValid()) {

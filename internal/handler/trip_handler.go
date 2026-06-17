@@ -13,7 +13,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// listTrips — GET /trips?office_id=&date=&lat=&lng=
+//listtrips получение trips office id date lat lng
 func (h *Handler) listTrips(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
@@ -56,7 +56,7 @@ func (h *Handler) listTrips(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// HTML или JSON в зависимости от Accept
+	// Html или json в зависимости от accept
 	if isHTMX(r) || acceptsHTML(r) {
 		offices, _ := h.officeSvc.ListOffices(r.Context(), user.CompanyID)
 
@@ -84,7 +84,7 @@ func (h *Handler) listTrips(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// getTrip — GET /trips/:id
+//gettrip получение trips id
 func (h *Handler) getTrip(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
@@ -106,7 +106,7 @@ func (h *Handler) getTrip(w http.ResponseWriter, r *http.Request) {
 	passengers, _ := h.tripSvc.GetPassengers(r.Context(), tripID)
 
 	isPassenger := false
-	// Находим остановку текущего пользователя
+	//поиск остановки текущего пользователя
 	for _, p := range passengers {
 		if p.UserID == user.ID {
 			isPassenger = true
@@ -147,14 +147,14 @@ func (h *Handler) getTrip(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// createTrip — POST /trips
+//Createtrip создание trips
 func (h *Handler) createTrip(w http.ResponseWriter, r *http.Request) {
 	userIDStr, _ := mw.GetUserID(r)
 	driverID, _ := uuid.Parse(userIDStr)
 
 	var req dto.CreateTripRequest
 	if err := h.decodeJSON(r, &req); err != nil {
-		// Попробуем прочитать как form data (HTMX)
+		// Попытка чтения как form data htmx
 		if err := r.ParseForm(); err == nil {
 			req.OfficeID = r.FormValue("office_id")
 			req.OriginAddress = r.FormValue("origin_address")
@@ -197,7 +197,7 @@ func (h *Handler) createTrip(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// joinTrip — POST /trips/:id/join
+// Jointrip присоединение к поездке
 func (h *Handler) joinTrip(w http.ResponseWriter, r *http.Request) {
 	tripID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -254,7 +254,7 @@ func (h *Handler) joinTrip(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// leaveTrip — POST /trips/:id/leave
+//leavetrip выход из поездки
 func (h *Handler) leaveTrip(w http.ResponseWriter, r *http.Request) {
 	tripID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -280,7 +280,7 @@ func (h *Handler) leaveTrip(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Вы покинули поездку"})
 }
 
-// cancelTrip — POST /trips/:id/cancel
+//canceltrip отмена поездки
 func (h *Handler) cancelTrip(w http.ResponseWriter, r *http.Request) {
 	tripID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
@@ -307,7 +307,7 @@ func (h *Handler) cancelTrip(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]string{"message": "Поездка отменена"})
 }
 
-// myTrips — GET /trips/my
+// mytrips получение поездок пользователя
 func (h *Handler) myTrips(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
@@ -334,14 +334,14 @@ func (h *Handler) myTrips(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Загружаем поездки, в которых пользователь участвует как пассажир
+	//Загрузка поездок в которых пользователь участвует как пассажир
 	joinedTrips, joinedTotal, _ := h.tripSvc.ListJoinedTrips(r.Context(), user.ID, tripsLimit, tripsOffset)
-	// Подгружаем остановки для каждой поездки пассажира
+	// Подгрузка остановок для каждой поездки пассажира
 	for _, t := range joinedTrips {
 		stops, _ := h.tripSvc.GetStopsByTripID(r.Context(), t.ID)
 		t.Stops = stops
 
-		// Находим остановку текущего пользователя
+		//Поиск остановки текущего пользователя
 		passengers, _ := h.tripSvc.GetPassengers(r.Context(), t.ID)
 		for _, p := range passengers {
 			if p.UserID == user.ID && p.StopID != nil {
@@ -374,7 +374,7 @@ func (h *Handler) myTrips(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]any{"trips": trips, "total": total, "joined_trips": joinedTrips})
 }
 
-// joinedTrips — GET /trips/joined
+// Joinedtrips получение поездок в которых пользователь пассажир
 func (h *Handler) joinedTrips(w http.ResponseWriter, r *http.Request) {
 	userIDStr, _ := mw.GetUserID(r)
 	userID, _ := uuid.Parse(userIDStr)
@@ -389,7 +389,7 @@ func (h *Handler) joinedTrips(w http.ResponseWriter, r *http.Request) {
 	h.respondJSON(w, http.StatusOK, map[string]any{"trips": trips, "total": total})
 }
 
-// routePreview — GET /api/route-preview?origin_lat=&origin_lng=&office_id=
+//Routepreview получение api route preview
 func (h *Handler) routePreview(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	lat, _ := strconv.ParseFloat(q.Get("origin_lat"), 64)
@@ -424,14 +424,14 @@ func (h *Handler) routePreview(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// createTripPage — GET /trips/new
+// Createtrippage получение страницы создания поездки
 func (h *Handler) createTripPage(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
 		return
 	}
 
-	// Получаем список офисов для компании пользователя
+	// Получение списка офисов для компании пользователя
 	offices, _ := h.officeSvc.ListOffices(r.Context(), user.CompanyID)
 
 	data := map[string]any{
@@ -444,7 +444,7 @@ func (h *Handler) createTripPage(w http.ResponseWriter, r *http.Request) {
 	h.renderTemplate(w, "create_trip.html", data)
 }
 
-// mapPage — GET /map
+// mappage получение страницы карты
 func (h *Handler) mapPage(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.getAuthUser(w, r)
 	if !ok {
@@ -463,12 +463,12 @@ func (h *Handler) mapPage(w http.ResponseWriter, r *http.Request) {
 	h.renderTemplate(w, "map.html", data)
 }
 
-// isHTMX проверяет, что запрос пришёл от HTMX
+//ishtmx проверка запроса от htmx
 func isHTMX(r *http.Request) bool {
 	return r.Header.Get("HX-Request") == "true"
 }
 
-// acceptsHTML проверяет Accept заголовок
+//Acceptshtml проверка accept заголовка
 func acceptsHTML(r *http.Request) bool {
 	accept := r.Header.Get("Accept")
 	return accept == "" || contains(accept, "text/html")

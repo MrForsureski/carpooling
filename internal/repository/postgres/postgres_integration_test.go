@@ -35,9 +35,9 @@ func TestPostgres_Integration(t *testing.T) {
 	driverID := uuid.New()
 	officeID := uuid.New()
 
-	// Начинаем транзакцию для проведения теста и автоматического отката в конце
+	//начало транзакции для теста и автоотката
 	err = txManager.WithinTransaction(ctx, func(txCtx context.Context) error {
-		// 1. Создаем компанию, пользователя и офис для тестовой структуры внешних ключей
+		//Создание компании пользователя и офиса для тестовой структуры
 		_, err := getDbRunner(txCtx, db).ExecContext(txCtx, `
 			INSERT INTO companies (id, name, email_domain, is_active, created_at, updated_at)
 			VALUES ($1, 'Test Company Integration', 'test-integration.com', true, NOW(), NOW())
@@ -62,7 +62,7 @@ func TestPostgres_Integration(t *testing.T) {
 			return err
 		}
 
-		// 2. Создаем поездку
+		//создание поездки
 		trip := &model.Trip{
 			ID:              uuid.New(),
 			DriverID:        driverID,
@@ -84,7 +84,7 @@ func TestPostgres_Integration(t *testing.T) {
 			return fmt.Errorf("failed to create trip: %w", err)
 		}
 
-		// 3. Выполняем GetForUpdate
+		// выполнение getforupdate
 		dbTrip, err := tripRepo.GetForUpdate(txCtx, trip.ID)
 		if err != nil {
 			return fmt.Errorf("failed to get trip for update: %w", err)
@@ -93,13 +93,13 @@ func TestPostgres_Integration(t *testing.T) {
 			return fmt.Errorf("expected seats left to be 4, got %d", dbTrip.SeatsLeft)
 		}
 
-		// 4. Декрементируем места
+		//декремент мест
 		err = tripRepo.DecrementSeats(txCtx, trip.ID)
 		if err != nil {
 			return fmt.Errorf("failed to decrement seats: %w", err)
 		}
 
-		// Проверяем изменение
+		//Проверка изменений
 		updatedTrip, err := tripRepo.GetByID(txCtx, trip.ID)
 		if err != nil {
 			return fmt.Errorf("failed to get updated trip: %w", err)
@@ -108,7 +108,7 @@ func TestPostgres_Integration(t *testing.T) {
 			return fmt.Errorf("expected seats left to be 3 after decrement, got %d", updatedTrip.SeatsLeft)
 		}
 
-		// Возвращаем ошибку для автоматического отката транзакции и очистки БД
+		// Возврат ошибки для автоотката транзакции
 		return errors.New("test_rollback")
 	})
 

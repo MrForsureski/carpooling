@@ -17,7 +17,7 @@ type extContext interface {
 	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
 }
 
-// TransactionManager управляет транзакциями в PostgreSQL
+//Transactionmanager управление транзакциями в postgresql
 type TransactionManager struct {
 	db *sqlx.DB
 }
@@ -26,7 +26,7 @@ func NewTransactionManager(db *sqlx.DB) *TransactionManager {
 	return &TransactionManager{db: db}
 }
 
-// WithinTransaction запускает функцию fn в транзакции.
+//Withintransaction запуск функции fn в транзакции
 func (tm *TransactionManager) WithinTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
 	if _, ok := ctx.Value(txKey{}).(*sqlx.Tx); ok {
 		return fn(ctx)
@@ -59,7 +59,7 @@ func (tm *TransactionManager) WithinTransaction(ctx context.Context, fn func(ctx
 	return nil
 }
 
-// getDbRunner возвращает *sqlx.Tx из контекста, если он есть, или базовый *sqlx.DB
+// Getdbrunner возврат sqlx tx или sqlx db
 func getDbRunner(ctx context.Context, db *sqlx.DB) extContext {
 	if tx, ok := ctx.Value(txKey{}).(*sqlx.Tx); ok {
 		return tx

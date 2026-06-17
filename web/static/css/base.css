@@ -6,7 +6,6 @@
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* Global Reusable Semantic Styles */
 .page-title {
     font-size: 1.5rem;
     font-weight: 700;
@@ -95,7 +94,6 @@
     cursor: not-allowed;
 }
 
-/* Layout and Navigation Components */
 .navbar {
     background-color: #ffffff;
     border-bottom: 1px solid #e2e8f0;
@@ -397,7 +395,6 @@
     background-color: #f5f3ff;
 }
 
-/* Shared Trips/Map Header and City Tabs */
 .trips-header {
     display: flex;
     flex-direction: column;
@@ -449,7 +446,7 @@
 }
 
 .main-content {
-    max-width: 80rem; /* 7xl */
+    max-width: 80rem; 
     margin-left: auto;
     margin-right: auto;
     padding-left: 2rem;
@@ -464,7 +461,6 @@ body {
     margin: 0;
 }
 
-/* Toast notifications */
 .toast-notification {
     position: fixed;
     top: 1rem;
@@ -510,7 +506,6 @@ body {
     margin: 0;
 }
 
-/* Footer layout */
 .page-footer {
     border-top: 1px solid #e2e8f0;
     margin-top: 4rem;
@@ -541,7 +536,6 @@ body {
     }
 }
 
-/* Spinners & Utility helpers */
 .spinner {
     animation: spin 1s linear infinite;
 }

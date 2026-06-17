@@ -4,7 +4,7 @@ import (
 	"office_trip/internal/model"
 )
 
-// CreateTripRequest — запрос на создание поездки
+//Createtriprequest запрос на создание поездки
 type CreateTripRequest struct {
 	OfficeID      string        `json:"office_id"      validate:"required,uuid4"`
 	OriginLat     float64       `json:"origin_lat"     validate:"required,latitude"`
@@ -21,7 +21,7 @@ type StopRequest struct {
 	Address string  `json:"address" validate:"required,max=500"`
 }
 
-// JoinTripRequest — запрос на присоединение
+//Jointriprequest запрос на присоединение
 type JoinTripRequest struct {
 	PickupLat     float64 `json:"pickup_lat"     validate:"omitempty,latitude"`
 	PickupLng     float64 `json:"pickup_lng"     validate:"omitempty,longitude"`
@@ -29,14 +29,14 @@ type JoinTripRequest struct {
 	StopID        string  `json:"stop_id"        validate:"required,uuid4"`
 }
 
-// TripListResponse — ответ при поиске поездок
+// triplistresponse ответ при поиске поездок
 type TripListResponse struct {
 	Trips []model.Trip `json:"trips"`
 	Total int          `json:"total"`
 	Page  int          `json:"page"`
 }
 
-// WSMessage — WebSocket сообщение
+// Wsmessage websocket сообщение
 type WSMessage struct {
 	Type string `json:"type"`
 	Data any    `json:"data"`

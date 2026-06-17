@@ -3,7 +3,6 @@
     min-height: 500px;
 }
 
-/* Map page Components */
 .office-card {
     background-color: #ffffff;
     border-radius: 1rem;
@@ -23,7 +22,6 @@
     box-shadow: 0 0 0 2px #6366f1 !important;
 }
 
-/* Layout and spacing rules */
 .map-container {
     max-width: 80rem;
     margin-left: auto;

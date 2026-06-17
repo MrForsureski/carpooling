@@ -1,10 +1,10 @@
 const trip = window.AppConfig.trip;
 
-// ========== КАРТА ==========
+// карта
 const map = L.map('trip-map').setView([trip.originLat, trip.originLng], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-// Маршрут
+// построение маршрута при выборе офиса
 const routeLayer = L.geoJSON(JSON.parse(trip.routeGeoJSON), {
     style: { color: '#6366f1', weight: 5, opacity: 0.9 }
 }).addTo(map);
@@ -12,7 +12,7 @@ if (routeLayer.getBounds().isValid()) {
     map.fitBounds(routeLayer.getBounds(), { padding: [30, 30] });
 }
 
-// Создаём круглый маркер
+// маркер
 function makeCircleIcon(bg, content, shadow) {
     return L.divIcon({
         className: '',
@@ -31,7 +31,7 @@ function makeCircleIcon(bg, content, shadow) {
     });
 }
 
-// 🔵 Маркер СТАРТА
+//маркер
 L.marker([trip.originLat, trip.originLng], {
     icon: makeCircleIcon('linear-gradient(135deg,#2563eb,#1d4ed8)', '🚌', 'rgba(37,99,235,0.45)')
 }).addTo(map).bindPopup(`
@@ -40,7 +40,7 @@ L.marker([trip.originLat, trip.originLng], {
         <span style="font-size:12px;color:#475569">Точка отправления водителя</span>
     </div>`);
 
-// 🟣 Маркеры ПРОМЕЖУТОЧНЫХ ОСТАНОВОК (с цифрами, прямыми)
+// маркер
 const stopMarkers = [];
 trip.stops.forEach(s => {
     const isUserStop = (trip.userPickupStopID && s.id === trip.userPickupStopID);
@@ -82,7 +82,7 @@ trip.stops.forEach(s => {
     stopMarkers.push({ id: s.id, marker });
 });
 
-// 🔴 Маркер ФИНИША / ОФИСА
+//Маркер
 try {
     const geom = JSON.parse(trip.routeGeoJSON);
     if (geom && geom.coordinates && geom.coordinates.length > 0) {
@@ -115,7 +115,7 @@ function highlightMapStop(stopId) {
     }
 }
 
-// ========== ALPINE ==========
+//Alpine
 function tripDetail() {
     return {
         selectedStopID: '',
