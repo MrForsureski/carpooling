@@ -62,89 +62,89 @@
                     <p class="notice-text">Наведите на поездку - на карте появятся остановки с номерами. Кликните на фиолетовый маркер чтобы присоединиться.</p>
                 </div>
             </div>
-        </div>
 
-        <div id="trips-list" class="trips-list-wrapper">
-            {{if .Trips}}
-            {{range .Trips}}
-            <div class="trip-card"
-                 data-trip-id="{{.ID}}"
-                 data-office-id="{{.OfficeID}}"
-                 data-route='{{.RouteGeoJSON}}'
-                 data-origin-lat="{{.OriginLat}}"
-                 data-origin-lng="{{.OriginLng}}"
-                 onmouseenter="highlightTrip(this)">
-                <div class="p-5">
-                    <div class="driver-profile-header justify-between">
-                        <div class="driver-profile-header">
-                            <div class="driver-avatar">
-                                <span class="driver-avatar-text">{{slice .DriverName 0 1}}</span>
+            <div id="trips-list" class="trips-list-wrapper">
+                {{if .Trips}}
+                {{range .Trips}}
+                <div class="trip-card"
+                     data-trip-id="{{.ID}}"
+                     data-office-id="{{.OfficeID}}"
+                     data-route='{{.RouteGeoJSON}}'
+                     data-origin-lat="{{.OriginLat}}"
+                     data-origin-lng="{{.OriginLng}}"
+                     onmouseenter="highlightTrip(this)">
+                    <div class="p-5">
+                        <div class="driver-profile-header justify-between">
+                            <div class="driver-profile-header">
+                                <div class="driver-avatar">
+                                    <span class="driver-avatar-text">{{slice .DriverName 0 1}}</span>
+                                </div>
+                                <div>
+                                    <p class="driver-fullname">{{.DriverName}}</p>
+                                    <p class="trip-card-subtitle">{{.OfficeName}}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="driver-fullname">{{.DriverName}}</p>
-                                <p class="trip-card-subtitle">{{.OfficeName}}</p>
+                            <div class="trip-header-time-box">
+                                <p class="trip-card-time">{{formatTime .DepartAt}}</p>
+                                <p class="trip-card-date">{{formatDate .DepartAt}}</p>
                             </div>
                         </div>
-                        <div class="trip-header-time-box">
-                            <p class="trip-card-time">{{formatTime .DepartAt}}</p>
-                            <p class="trip-card-date">{{formatDate .DepartAt}}</p>
-                        </div>
-                    </div>
 
-                    <div class="trip-stats-grid">
-                        <div class="trip-stat-box">
-                            <p class="trip-stat-label">Мест</p>
-                            <p class="trip-stat-val">{{.SeatsLeft}}/{{.SeatsTotal}}</p>
-                        </div>
-                        <div class="trip-stat-box">
-                            <p class="trip-stat-label">В пути</p>
-                            <p class="trip-stat-val">{{formatDuration .DurationSeconds}}</p>
-                        </div>
-                        <div class="trip-stat-box">
-                            <p class="trip-stat-label">Расстояние</p>
-                            <p class="trip-stat-val">{{formatDistanceInt .DistanceMeters}}</p>
-                        </div>
-                    </div>
-
-                    {{if .Stops}}
-                    <div class="trip-stops-box">
-                        <p class="trip-stops-title">Остановки ({{len .Stops}})</p>
-                        <div class="trip-stops-list">
-                            {{range .Stops}}
-                            <div class="trip-stop-item">
-                                <span class="trip-stop-badge">{{.SequenceNumber}}</span>
-                                <span class="trip-stop-address">{{.Address}}</span>
-                                <span class="trip-stop-time">{{formatTime .ArrivalTime}}</span>
+                        <div class="trip-stats-grid">
+                            <div class="trip-stat-box">
+                                <p class="trip-stat-label">Мест</p>
+                                <p class="trip-stat-val">{{.SeatsLeft}}/{{.SeatsTotal}}</p>
                             </div>
-                            {{end}}
+                            <div class="trip-stat-box">
+                                <p class="trip-stat-label">В пути</p>
+                                <p class="trip-stat-val">{{formatDuration .DurationSeconds}}</p>
+                            </div>
+                            <div class="trip-stat-box">
+                                <p class="trip-stat-label">Расстояние</p>
+                                <p class="trip-stat-val">{{formatDistanceInt .DistanceMeters}}</p>
+                            </div>
                         </div>
-                    </div>
-                    {{end}}
 
-                    <div class="trip-card-actions">
-                        <a href="/trips/{{.ID}}"
-                           class="btn-trip-details">
-                            Подробнее о поездке →
-                        </a>
+                        {{if .Stops}}
+                        <div class="trip-stops-box">
+                            <p class="trip-stops-title">Остановки ({{len .Stops}})</p>
+                            <div class="trip-stops-list">
+                                {{range .Stops}}
+                                <div class="trip-stop-item">
+                                    <span class="trip-stop-badge">{{.SequenceNumber}}</span>
+                                    <span class="trip-stop-address">{{.Address}}</span>
+                                    <span class="trip-stop-time">{{formatTime .ArrivalTime}}</span>
+                                </div>
+                                {{end}}
+                            </div>
+                        </div>
+                        {{end}}
+
+                        <div class="trip-card-actions">
+                            <a href="/trips/{{.ID}}"
+                               class="btn-trip-details">
+                                Подробнее о поездке →
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {{end}}
+                {{end}}
 
-            <div id="no-trips-filtered-placeholder" class="trips-empty-placeholder hidden">
-                <div class="trips-empty-icon"></div>
-                <h3 class="trips-empty-title">Поездки не найдены</h3>
-                <p class="trips-empty-subtitle">Попробуйте другую дату или офис в выбранном городе</p>
-            </div>
+                <div id="no-trips-filtered-placeholder" class="trips-empty-placeholder hidden">
+                    <div class="trips-empty-icon"></div>
+                    <h3 class="trips-empty-title">Поездки не найдены</h3>
+                    <p class="trips-empty-subtitle">Попробуйте другую дату или офис в выбранном городе</p>
+                </div>
 
-            <p id="trips-count-text" class="trips-count-text">Показано {{len .Trips}} из {{.Total}} поездок</p>
-            {{else}}
-            <div class="trips-empty-placeholder">
-                <div class="trips-empty-icon"></div>
-                <h3 class="trips-empty-title">Поездки не найдены</h3>
-                <p class="trips-empty-subtitle">Попробуйте другую дату или офис</p>
+                <p id="trips-count-text" class="trips-count-text">Показано {{len .Trips}} из {{.Total}} поездок</p>
+                {{else}}
+                <div class="trips-empty-placeholder">
+                    <div class="trips-empty-icon"></div>
+                    <h3 class="trips-empty-title">Поездки не найдены</h3>
+                    <p class="trips-empty-subtitle">Попробуйте другую дату или офис</p>
+                </div>
+                {{end}}
             </div>
-            {{end}}
         </div>
 
         <div class="trips-right-col">
