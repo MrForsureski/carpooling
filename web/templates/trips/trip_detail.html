@@ -1,6 +1,6 @@
 {{template "base.html" .}}
 
-{{define "title"}}{{.Trip.DriverName}} → {{.Trip.OfficeName}} — {{.AppName}}{{end}}
+{{define "title"}}{{.Trip.DriverName}} → {{.Trip.OfficeName}} - {{.AppName}}{{end}}
 
 {{define "head"}}
 <link rel="stylesheet" href="/static/css/trips/trip_detail.css?v={{.Trip.UpdatedAt.Unix}}">
@@ -176,7 +176,7 @@
                         {{if .Trip.Stops}}
                         <select x-model="selectedStopID" @change="onStopSelectDropdown()"
                                 class="input-text mb-2">
-                            <option value="">— Выберите остановку —</option>
+                            <option value="">- Выберите остановку -</option>
                             {{range .Trip.Stops}}
                             <option value="{{.ID}}">Остановка {{.SequenceNumber}}: {{.Address}} ({{formatTime .ArrivalTime}})</option>
                             {{end}}

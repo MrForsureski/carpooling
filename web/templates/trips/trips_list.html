@@ -1,6 +1,6 @@
 {{template "base.html" .}}
 
-{{define "title"}}Поиск поездок — {{.AppName}}{{end}}
+{{define "title"}}Поиск поездок - {{.AppName}}{{end}}
 
 {{define "head"}}
 <link rel="stylesheet" href="/static/css/trips/trips_list.css?v=1.0.2">
@@ -59,14 +59,8 @@
                 </div>
                 <div class="notice-box">
                     <span class="notice-icon">i</span>
-                    <p class="notice-text">Наведите на поездку — на карте появятся остановки с номерами. Кликните на фиолетовый маркер чтобы присоединиться.</p>
+                    <p class="notice-text">Наведите на поездку - на карте появятся остановки с номерами. Кликните на фиолетовый маркер чтобы присоединиться.</p>
                 </div>
-            </div>
-        </div>
-
-        <div class="trips-right-col">
-            <div class="map-card-wrapper">
-                <div id="trips-map"></div>
             </div>
         </div>
 
@@ -151,6 +145,12 @@
                 <p class="trips-empty-subtitle">Попробуйте другую дату или офис</p>
             </div>
             {{end}}
+        </div>
+
+        <div class="trips-right-col">
+            <div class="map-card-wrapper">
+                <div id="trips-map"></div>
+            </div>
         </div>
     </div>
 

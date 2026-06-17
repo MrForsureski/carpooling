@@ -1,6 +1,6 @@
 {{template "base.html" .}}
 
-{{define "title"}}Создать поездку — {{.AppName}}{{end}}
+{{define "title"}}Создать поездку - {{.AppName}}{{end}}
 
 {{define "head"}}
 <link rel="stylesheet" href="/static/css/trips/create_trip.css?v=1.0.2">
@@ -25,7 +25,7 @@
                     <select name="office_id" x-model="officeId" @change="loadOffice()"
                             id="office-select"
                             class="input-text">
-                        <option value="">— выберите офис —</option>
+                        <option value="">- выберите офис -</option>
                         {{range .Offices}}
                         <option value="{{.ID}}">{{.Name}}</option>
                         {{end}}

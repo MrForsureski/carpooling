@@ -81,7 +81,7 @@ func (h *Handler) loadTemplates() {
 		},
 		"formatDistance": func(meters float64) string {
 			if meters == 0 {
-				return "—"
+				return "-"
 			}
 			if meters < 1000 {
 				return fmt.Sprintf("%.0f м", meters)
@@ -90,7 +90,7 @@ func (h *Handler) loadTemplates() {
 		},
 		"formatDistanceInt": func(meters int) string {
 			if meters == 0 {
-				return "—"
+				return "-"
 			}
 			if meters < 1000 {
 				return fmt.Sprintf("%d м", meters)

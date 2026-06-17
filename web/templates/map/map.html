@@ -1,6 +1,6 @@
 {{template "base.html" .}}
 
-{{define "title"}}Карта офисов — {{.AppName}}{{end}}
+{{define "title"}}Карта офисов - {{.AppName}}{{end}}
 
 {{define "head"}}
 <link rel="stylesheet" href="/static/css/map/map.css?v=1.0.2">
@@ -57,7 +57,6 @@
                         </div>
                         {{if .IsActive}}
                         <span class="badge-office-active">
-                            <span class="badge-office-dot"></span>
                             Активен
                         </span>
                         {{else}}
